@@ -99,10 +99,34 @@ spl_autoload_register(function (string $class) {
     if (!str_starts_with($class, $prefix)) {
         return;
     }
+
     $relative = substr($class, strlen($prefix));
-    $file = APP_PATH . '/' . str_replace('\\', '/', $relative) . '.php';
-    if (is_file($file)) {
-        require_once $file;
+
+    $relativePath = str_replace('\\', '/', $relative) . '.php';
+    $candidates = [$relativePath];
+
+    $segments = explode('/', $relativePath);
+    if ($segments !== []) {
+        $segments[0] = match ($segments[0]) {
+            'Controllers' => 'controllers',
+            'Models' => 'models',
+            'Services' => 'services',
+            'Middleware' => 'middleware',
+            default => $segments[0],
+        };
+
+        $normalizedPath = implode('/', $segments);
+        if (!in_array($normalizedPath, $candidates, true)) {
+            $candidates[] = $normalizedPath;
+        }
+    }
+
+    foreach ($candidates as $candidate) {
+        $file = APP_PATH . '/' . $candidate;
+        if (is_file($file)) {
+            require_once $file;
+            return;
+        }
     }
 });
 
