@@ -393,6 +393,15 @@ class AuthService
         return $user;
     }
 
+    private static function isSecureRequest(): bool
+    {
+        $forwardedProto = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+
+        return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+            || (string) ($_SERVER['SERVER_PORT'] ?? '') === '443'
+            || $forwardedProto === 'https';
+    }
+
     private static function issueRememberToken(int $userId): void
     {
         $selector = bin2hex(random_bytes(8));
@@ -413,7 +422,7 @@ class AuthService
         setcookie(self::REMEMBER_COOKIE, $selector . ':' . $token, [
             'expires' => $expires,
             'path' => '/',
-            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'secure' => self::isSecureRequest(),
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
@@ -439,7 +448,7 @@ class AuthService
         setcookie(self::REMEMBER_COOKIE, '', [
             'expires' => time() - 3600,
             'path' => '/',
-            'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'secure' => self::isSecureRequest(),
             'httponly' => true,
             'samesite' => 'Lax',
         ]);
@@ -455,7 +464,7 @@ class AuthService
             setcookie(session_name(), '', [
                 'expires' => time() - 3600,
                 'path' => '/',
-                'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+                'secure' => self::isSecureRequest(),
                 'httponly' => true,
                 'samesite' => 'Lax',
             ]);

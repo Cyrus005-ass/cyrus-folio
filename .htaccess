@@ -1,8 +1,10 @@
 RewriteEngine On
 
-# Bloque les dotfiles et les dossiers applicatifs hors public.
+# Bloque les dotfiles, les outils de dev et les dossiers applicatifs hors public.
 RewriteRule (^|/)\. - [F,L]
-RewriteRule ^(app|config|database|resources|storage|vendor)/ - [F,L]
+RewriteRule ^(app|config|database|resources|storage|vendor|node_modules|scripts)/ - [F,L,NC]
+RewriteRule ^public/ - [F,L,NC]
+RewriteRule ^(?:composer\.(?:json|lock)|package(?:-lock)?\.json|README(?:\.[^/]+)?|.*\.(?:md|sql|log|ini|bak|dist|ya?ml))$ - [F,L,NC]
 
 # Sert les fichiers statiques du dossier public sans exposer les autres repertoires.
 RewriteRule ^(assets/.+)$ public/$1 [L,NC]
@@ -14,4 +16,3 @@ RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^$ index.php [L]
 RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
-

@@ -23,27 +23,41 @@ if (!headers_sent()) {
         "default-src 'self'",
         "base-uri 'self'",
         "form-action 'self'",
-        "frame-ancestors 'self'",
+        "frame-ancestors 'none'",
         "object-src 'none'",
-        "script-src 'self' 'unsafe-inline' https://www.gstatic.com",
+        "script-src 'self' https://www.gstatic.com",
         "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
         "font-src 'self' https://fonts.gstatic.com data:",
         "img-src 'self' data: https:",
         "media-src 'self' data: blob: https:",
         "connect-src 'self' https:",
-        "frame-src 'self' https:",
+        "frame-src 'self' https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
+        "manifest-src 'self'",
     ];
+
+    if ($secureCookie) {
+        $cspDirectives[] = 'upgrade-insecure-requests';
+    }
+
+    $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+    $isSensitiveResponse = preg_match('#/(admin|api/v1/auth)(?:/|$)#', $requestPath) === 1;
 
     header_remove('X-Powered-By');
     header('Content-Security-Policy: ' . implode('; ', $cspDirectives));
     header('Permissions-Policy: camera=(), geolocation=(), microphone=(), payment=(), usb=()');
-    header('X-Frame-Options: SAMEORIGIN');
+    header('X-Frame-Options: DENY');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
     header('X-Permitted-Cross-Domain-Policies: none');
     header('Cross-Origin-Opener-Policy: same-origin');
     header('Cross-Origin-Resource-Policy: same-origin');
     header('Origin-Agent-Cluster: ?1');
+
+    if ($isSensitiveResponse) {
+        header('Cache-Control: no-store, no-cache, must-revalidate, max-age=0');
+        header('Pragma: no-cache');
+        header('Expires: 0');
+    }
 
     if ($secureCookie) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
@@ -145,4 +159,3 @@ try {
 } catch (Throwable $e) {
     // La base n'est peut-etre pas encore importee. La page d'installation/README guide l'utilisateur.
 }
-

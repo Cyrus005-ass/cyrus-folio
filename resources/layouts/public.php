@@ -87,6 +87,6 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
 <?php require RESOURCE_PATH . '/components/footer.php'; ?>
 <?php require RESOURCE_PATH . '/components/chatbot-widget.php'; ?>
 <script src='<?= asset('js/main.js') ?>'></script>
-<script src='<?= asset('js/chatbot.js') ?>'></script>
+<script src='<?= asset('js/assistant-ui.js') ?>'></script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <div class='chatbot'>
-    <div class='chat-panel' id='portfolio-chatbot' aria-hidden='true' data-chat-panel data-chat-endpoint='<?= e(path_url('/api/v1/chatbot/message')) ?>'>
+    <div class='chat-panel' id='portfolio-chatbot' aria-hidden='true' data-chat-panel data-chat-endpoint='<?= e(path_url('/api/v1/assistant/message')) ?>'>
         <div class='chat-head'>
             <div class='chat-head-copy'>
                 <strong>Assistant de Cyrus-y</strong>

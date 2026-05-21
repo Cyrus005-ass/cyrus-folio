@@ -62,7 +62,7 @@ Pour cela :
 - Contact : `https://cyrusportfolio.unaux.com/contact`
 - Login admin : `https://cyrusportfolio.unaux.com/admin/login`
 - Dashboard admin : `https://cyrusportfolio.unaux.com/admin`
-- API chatbot : `https://cyrusportfolio.unaux.com/api/v1/chatbot/message`
+- API chatbot : `https://cyrusportfolio.unaux.com/api/v1/assistant/message`
 
 ## Variables d'environnement importantes
 ### Application
@@ -162,7 +162,7 @@ Pour cela :
 
 ### Exemple : chatbot
 - `resources/components/chatbot-widget.php` affiche le widget.
-- `public/assets/js/chatbot.js` capture le message et appelle `/api/v1/chatbot/message`.
+- `public/assets/js/assistant-ui.js` capture le message et appelle `/api/v1/assistant/message`.
 - `ChatbotController::message()` delegue a `ChatbotService`.
 - `ChatbotService` tente Groq si une cle existe.
 - Si Groq echoue, un fallback local repond a partir du profil, des projets, des competences, des certifications et de la base de connaissance.
@@ -321,7 +321,7 @@ Ces fichiers existent pour de futures extensions. Aujourd'hui, les controleurs u
 
 ### `public/assets/js/`
 - `main.js` : menu mobile, header scrolle, animation du texte du hero, reveals au scroll.
-- `chatbot.js` : ouverture du widget, historique local, appel API chatbot.
+- `assistant-ui.js` : ouverture du widget, historique local, appel API chatbot.
 - `admin.js` : autogrow textarea, preview images, mini rich editor, preview du theme, geo chart analytics.
 - `theme-engine.js` : placeholder pour evolutions futures de preview theme.
 - `analytics.js` : placeholder indiquant que le tracking est fait cote serveur.
@@ -432,7 +432,7 @@ Tu peux y gerer :
 - `PUT /api/v1/notifications/{id}/read`
 
 ### Chatbot
-- `POST /api/v1/chatbot/message`
+- `POST /api/v1/assistant/message`
 - `GET /api/v1/chatbot/knowledge`
 - `POST /api/v1/chatbot/knowledge`
 
@@ -478,14 +478,14 @@ La video est rendue dans `resources/views/public/about.php` et pas sur l'accueil
 ## Systeme chatbot
 ### Fichiers clefs
 - `resources/components/chatbot-widget.php` : widget HTML
-- `public/assets/js/chatbot.js` : logique front
+- `public/assets/js/assistant-ui.js` : logique front
 - `app/controllers/ChatbotController.php` : endpoint et admin knowledge
 - `app/services/ChatbotService.php` : logique metier
 - `resources/views/admin/chatbot.php` : console admin du chatbot
 - `storage/logs/chatbot.log` : logs des erreurs distantes
 
 ### Comment il repond
-1. Le widget envoie le message et un petit historique a `/api/v1/chatbot/message`.
+1. Le widget envoie le message et un petit historique a `/api/v1/assistant/message`.
 2. `ChatbotService` tente d'abord Groq si `GROQ_API_KEY` existe.
 3. Si Groq repond correctement, la reponse distante est utilisee.
 4. Sinon, le service bascule sur une reponse locale basee sur :
@@ -543,7 +543,7 @@ Cette liste resume les fichiers les plus importants modifies/adaptes pour l'etat
 - `app/helpers/helpers.php` : helpers sociaux, video, theme par defaut
 - `app/services/ChatbotService.php` : logique chatbot, Groq, fallback, logs
 - `app/controllers/ChatbotController.php` : endpoint et diagnostics admin
-- `public/assets/js/chatbot.js` : experience front du chatbot
+- `public/assets/js/assistant-ui.js` : experience front du chatbot
 - `public/assets/js/main.js` : menu mobile, animation de texte, reveals
 
 ## Conseils pour mieux utiliser ce code

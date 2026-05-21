@@ -2,6 +2,31 @@
 
 declare(strict_types=1);
 
+$hostHeader = trim((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+$host = strtolower(trim((string) explode(',', $hostHeader)[0]));
+if (str_starts_with($host, '[') && str_contains($host, ']')) {
+    $host = substr($host, 1, max(0, strpos($host, ']') - 1));
+} else {
+    $host = preg_replace('/:\d+$/', '', $host) ?? $host;
+}
+
+$remoteIp = trim((string) ($_SERVER['REMOTE_ADDR'] ?? ''));
+$isPrivateIpv4 = $remoteIp !== '' && preg_match('/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $remoteIp) === 1;
+$isLocalRequest = PHP_SAPI === 'cli'
+    || in_array($host, ['localhost', '127.0.0.1', '::1', 'host.docker.internal'], true)
+    || str_ends_with($host, '.local')
+    || str_ends_with($host, '.test')
+    || str_ends_with($host, '.localhost')
+    || str_ends_with($host, '.internal')
+    || in_array($remoteIp, ['127.0.0.1', '::1'], true)
+    || $isPrivateIpv4;
+
+if (!$isLocalRequest) {
+    http_response_code(404);
+    header('Content-Type: text/plain; charset=UTF-8');
+    exit('Not Found');
+}
+
 $password = trim((string) ($_POST['password'] ?? $_GET['password'] ?? ''));
 $hash = $password !== '' ? password_hash($password, PASSWORD_DEFAULT) : null;
 ?>

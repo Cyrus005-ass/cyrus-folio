@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   const history = [];
-  const endpoint = panel.dataset.chatEndpoint || '/api/v1/chatbot/message';
+  const endpoint = panel.dataset.chatEndpoint || '/api/v1/assistant/message';
 
   const scrollToBottom = () => {
     body.scrollTop = body.scrollHeight;

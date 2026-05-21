@@ -130,6 +130,7 @@ $router->delete('/api/v1/messages/{id}', [ContactController::class, 'destroyApi'
 $router->get('/api/v1/notifications', [NotificationController::class, 'indexApi']);
 $router->put('/api/v1/notifications/{id}/read', [NotificationController::class, 'read']);
 
+$router->post('/api/v1/assistant/message', [ChatbotController::class, 'message']);
 $router->post('/api/v1/chatbot/message', [ChatbotController::class, 'message']);
 $router->get('/api/v1/chatbot/knowledge', [ChatbotController::class, 'knowledgeApi']);
 $router->post('/api/v1/chatbot/knowledge', [ChatbotController::class, 'storeKnowledge']);
