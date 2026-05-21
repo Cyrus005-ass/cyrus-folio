@@ -1,6 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
   <g fill="#000" font-family="Segoe UI, Arial, sans-serif" font-weight="800" text-rendering="geometricPrecision">
-    <text x="11" y="43" font-size="33" letter-spacing="-1">C</text>
-    <text x="30" y="37" font-size="15" letter-spacing="-0.5">-Y</text>
+    <text x="10" y="44" font-size="28" letter-spacing="-1">C</text>
+    <rect x="26.5" y="28.8" width="7" height="3.6" rx="1.8" fill="#000"/>
+    <text x="34" y="44" font-size="28" letter-spacing="-1">Y</text>
   </g>
 </svg>
