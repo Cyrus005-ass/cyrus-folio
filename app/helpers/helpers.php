@@ -191,23 +191,12 @@ if (!function_exists('normalize_app_path')) {
 if (!function_exists('app_url')) {
     function app_url(): string
     {
-        $configured = rtrim((string) env('APP_URL', ''), '/');
-        $runtime = request_base_url();
-        if ($runtime === null || $runtime === '') {
-            return $configured;
-        }
-
-        if ($configured === '') {
+        $runtime = rtrim((string) request_base_url(), '/');
+        if ($runtime !== '') {
             return $runtime;
         }
 
-        $configuredHost = normalize_host_name((string) parse_url($configured, PHP_URL_HOST));
-        $runtimeHost = normalize_host_name((string) parse_url($runtime, PHP_URL_HOST));
-        if ($runtimeHost !== '' && ($runtimeHost === $configuredHost || is_local_host_name($runtimeHost))) {
-            return $runtime;
-        }
-
-        return $configured;
+        return rtrim((string) env('APP_URL', ''), '/');
     }
 }
 

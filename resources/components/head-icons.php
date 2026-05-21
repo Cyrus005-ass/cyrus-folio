@@ -8,16 +8,12 @@ $iconHref = static function (?string $path): string {
         return '';
     }
 
-    $url = absolute_url($path) ?? '';
-    if ($url === '') {
-        return '';
-    }
-
     if (preg_match('/^https?:\/\//i', $path) === 1) {
-        return $url;
+        return $path;
     }
 
     $normalized = ltrim(str_replace('\\', '/', $path), '/');
+    $url = path_url($normalized);
     $candidates = [
         public_path($normalized),
         public_path('assets/' . $normalized),

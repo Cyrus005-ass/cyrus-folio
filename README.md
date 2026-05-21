@@ -46,7 +46,7 @@ Ce README documente la structure du projet, le role des fichiers et dossiers uti
 5. Lancer `npm install` puis `npm run build:assets` si tu veux regenerer les assets minifies.
 6. En local WAMP, ouvrir `http://localhost/portfolio-os`.
 7. En local WAMP, ouvrir `http://localhost/portfolio-os/admin/login` pour l'administration.
-8. En production, ouvrir `https://cyrus-youp.unaux.com`.
+8. En production, ouvrir `https://cyrusportfolio.unaux.com`.
 ### Premier administrateur
 Le projet peut creer automatiquement un premier compte admin si la table `users` est vide.
 
@@ -57,12 +57,12 @@ Pour cela :
 - remettre ensuite `ADMIN_BOOTSTRAP_ENABLED=false`
 
 ## URLs utiles
-- Site public : `https://cyrus-youp.unaux.com`
-- A propos : `https://cyrus-youp.unaux.com/about`
-- Contact : `https://cyrus-youp.unaux.com/contact`
-- Login admin : `https://cyrus-youp.unaux.com/admin/login`
-- Dashboard admin : `https://cyrus-youp.unaux.com/admin`
-- API chatbot : `https://cyrus-youp.unaux.com/api/v1/chatbot/message`
+- Site public : `https://cyrusportfolio.unaux.com`
+- A propos : `https://cyrusportfolio.unaux.com/about`
+- Contact : `https://cyrusportfolio.unaux.com/contact`
+- Login admin : `https://cyrusportfolio.unaux.com/admin/login`
+- Dashboard admin : `https://cyrusportfolio.unaux.com/admin`
+- API chatbot : `https://cyrusportfolio.unaux.com/api/v1/chatbot/message`
 
 ## Variables d'environnement importantes
 ### Application
