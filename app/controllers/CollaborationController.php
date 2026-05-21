@@ -35,7 +35,7 @@ class CollaborationController extends Controller
         }
 
         (new Collaboration())->create($data);
-        flash('success', 'Collaboration ajoutee.');
+        flash('success', 'Collaboration ajout?e.');
         redirect('/admin/collaborations');
     }
 
@@ -57,7 +57,7 @@ class CollaborationController extends Controller
         }
 
         $model->update($id, $data);
-        flash('success', 'Collaboration mise a jour.');
+        flash('success', 'Collaboration mise ? jour.');
         redirect('/admin/collaborations');
     }
 
@@ -72,7 +72,7 @@ class CollaborationController extends Controller
         }
 
         $model->delete($id);
-        flash('success', 'Collaboration supprimee.');
+        flash('success', 'Collaboration supprim?e.');
         redirect('/admin/collaborations');
     }
 

@@ -1,0 +1,19 @@
+﻿{
+  "name": "Cyrus-y ASSOGBA",
+  "short_name": "C-Y",
+  "icons": [
+    {
+      "src": "/assets/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#2563eb",
+  "background_color": "#111111",
+  "display": "standalone"
+}

@@ -2,6 +2,7 @@
 use App\Services\ThemeService;
 
 $siteName = (string) env('APP_NAME', 'Cyrus-y ASSOGBA');
+$pageTitle = trim((string) ($pageTitle ?? 'Connexion admin'));
 $activeTheme = ThemeService::activeTheme();
 $themeColor = trim((string) ($activeTheme['primary_color'] ?? '#ff4d4f'));
 ?>
@@ -10,10 +11,11 @@ $themeColor = trim((string) ($activeTheme['primary_color'] ?? '#ff4d4f'));
 <head>
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <title>Connexion admin | <?= e($siteName) ?></title>
+    <title><?= e($pageTitle) ?> | <?= e($siteName) ?></title>
     <meta name='robots' content='noindex,nofollow'>
     <meta name='referrer' content='strict-origin-when-cross-origin'>
     <meta name='theme-color' content='<?= e($themeColor) ?>'>
+    <?php require RESOURCE_PATH . '/components/head-icons.php'; ?>
     <?php if ($fontStylesheetUrl = ThemeService::fontStylesheetUrl($activeTheme)): ?>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>

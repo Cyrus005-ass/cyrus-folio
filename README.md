@@ -311,7 +311,7 @@ Ces fichiers existent pour de futures extensions. Aujourd'hui, les controleurs u
 
 ### `public/`
 - `public/index.php` : front-controller principal.
-- `public/api/README.md` : note rapide sur les endpoints REST.
+
 
 ### `public/assets/css/`
 - `main.css` : style principal du site public, hero, pages internes, footer, chatbot, responsive, home, about, etc.

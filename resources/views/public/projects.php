@@ -1,9 +1,9 @@
-<section class='section page-shell'>
+<section class='section page-shell projects-page'>
     <div class='container'>
         <div class='page-hero card'>
             <div class='kicker'>Catalogue</div>
             <h1>Tous les projets</h1>
-            <p class='lead'>Explore les realisations, stacks techniques et liens de demonstration dans une grille visuelle plus proche de la direction Craftivo.</p>
+            <p class='lead'>Explore les réalisations, les stacks techniques et les liens de démonstration dans une grille plus compacte et plus lisible.</p>
         </div>
 
         <?php if (!empty($technology)): ?>
@@ -11,10 +11,10 @@
         <?php endif; ?>
 
         <?php if (!empty($projects)): ?>
-            <div class='portfolio-grid listing-grid'>
+            <div class='portfolio-grid listing-grid projects-grid'>
                 <?php foreach ($projects as $project): ?>
                     <?php $projectImage = absolute_url($project['image_url'] ?? null) ?? ''; ?>
-                    <article class='portfolio-card'>
+                    <article class='portfolio-card project-list-card'>
                         <div class='portfolio-media'>
                             <?php if ($projectImage !== ''): ?>
                                 <img src='<?= e($projectImage) ?>' alt='<?= e($project['titre']) ?>' loading='lazy' decoding='async' fetchpriority='low'>
@@ -26,7 +26,7 @@
                         <div class='portfolio-copy'>
                             <div class='split-line'>
                                 <h3><?= e($project['titre']) ?></h3>
-                                <span class='meta'><?= e($project['statut'] ?? 'publie') ?></span>
+                                <span class='meta'><?= e(publication_status_label($project['statut'] ?? '')) ?></span>
                             </div>
 
                             <p class='meta'><?= e($project['description'] ?? '') ?></p>
@@ -40,9 +40,9 @@
                         <?php endif; ?>
 
                             <div class='button-row'>
-                                <a class='btn ghost' href='<?= url('/projects/' . ($project['slug'] ?? '')) ?>'>Details</a>
+                                <a class='btn ghost' href='<?= url('/projects/' . ($project['slug'] ?? '')) ?>'>Détails</a>
                                 <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($project['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Demo</a><?php endif; ?>
+                                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la démo</a><?php endif; ?>
                             </div>
                         </div>
                     </article>

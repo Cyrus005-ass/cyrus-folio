@@ -27,9 +27,9 @@
       <strong>Navigation</strong>
       <div class='footer-links-list'>
         <a href='<?= url('/') ?>'>Accueil</a>
-        <a href='<?= url('/about') ?>'>A propos</a>
+        <a href='<?= url('/about') ?>'>À propos</a>
         <a href='<?= url('/projects') ?>'>Projets</a>
-        <a href='<?= url('/skills') ?>'>Competences</a>
+        <a href='<?= url('/skills') ?>'>Compétences</a>
         <a href='<?= url('/blog') ?>'>Blog</a>
       </div>
     </div>
@@ -47,7 +47,7 @@
   </div>
 
   <div class='container footer-bar'>
-    <p><?= date('Y') ?> <?= e($displayName) ?>. Tous droits reserves.</p>
-    <p>Portfolio personnel, administrable et evolutif.</p>
+    <p><?= date('Y') ?> <?= e($displayName) ?>. Tous droits réservés.</p>
+    <p>Portfolio personnel, administrable et évolutif.</p>
   </div>
 </footer>

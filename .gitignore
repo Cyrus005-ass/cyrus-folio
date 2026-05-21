@@ -1,5 +1,6 @@
 .env
 .env.local
+public/assets/icons-local/
 node_modules/
 vendor/
 storage/

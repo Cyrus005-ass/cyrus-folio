@@ -72,8 +72,8 @@ class PublicController extends Controller
         }
 
         $homeStats = array_values(array_filter([
-            ['value' => (string) count($projects), 'label' => 'Projets publies'],
-            ['value' => (string) count($allSkills), 'label' => 'Competences actives'],
+            ['value' => (string) count($projects), 'label' => 'Projets publiés'],
+            ['value' => (string) count($allSkills), 'label' => 'Compétences actives'],
             ['value' => (string) count($certifications), 'label' => 'Certifications'],
         ], static fn (array $item): bool => (int) ($item['value'] ?? 0) > 0));
 
@@ -99,7 +99,7 @@ class PublicController extends Controller
         }
         $description = $technology
             ? 'Selection de projets autour de ' . $technology . ' dans le portfolio de ' . ($profileName !== '' ? $profileName : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.'
-            : 'Decouvre les projets, stacks techniques et demonstrations du portfolio de ' . ($profileName !== '' ? $profileName : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.';
+            : 'Decouvre les projets, stacks techniques et démonstrations du portfolio de ' . ($profileName !== '' ? $profileName : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.';
 
         $this->view('public/projects', $this->baseData([
             'title' => 'Projets',
@@ -137,8 +137,8 @@ class PublicController extends Controller
     {
         AnalyticsService::track();
         $this->view('public/skills', $this->baseData([
-            'title' => 'Competences',
-            'metaDescription' => 'Competences techniques, outils et niveaux maitrises sur le portfolio de ' . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.',
+            'title' => 'Compétences',
+            'metaDescription' => 'Compétences techniques, outils et niveaux maîtrisés sur le portfolio de ' . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.',
             'groups' => (new Skill())->groupedActive(),
         ]));
     }
@@ -158,7 +158,7 @@ class PublicController extends Controller
         AnalyticsService::track();
         $this->view('public/blog', $this->baseData([
             'title' => 'Blog',
-            'metaDescription' => 'Articles, retours d experience et veille technique publies sur le portfolio de ' . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.',
+            'metaDescription' => "Articles, retours d'expérience et veille technique publiés sur le portfolio de " . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . '.',
             'posts' => (new Post())->published(),
         ]));
     }
@@ -210,14 +210,14 @@ class PublicController extends Controller
         $certifications = (new Certification())->active();
         $aboutStats = [
             ['value' => (string) count($projects), 'label' => 'Projets'],
-            ['value' => (string) count($allSkills), 'label' => 'Competences'],
-            ['value' => (string) count($certifications), 'label' => 'Certifs'],
+            ['value' => (string) count($allSkills), 'label' => 'Compétences'],
+            ['value' => (string) count($certifications), 'label' => 'Certifications'],
         ];
         $hasStats = array_sum(array_map(static fn ($item) => (int) ($item['value'] ?? 0), $aboutStats)) > 0;
 
         $this->view('public/about', $this->baseData([
-            'title' => 'A propos',
-            'metaDescription' => 'En savoir plus sur ' . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . ', son parcours, son profil et sa presentation.',
+            'title' => 'À propos',
+            'metaDescription' => 'En savoir plus sur ' . (is_array($this->profile()) ? ((string) (($this->profile()['full_name'] ?? '') ?: app_config('name', 'Cyrus-y ASSOGBA'))) : (string) app_config('name', 'Cyrus-y ASSOGBA')) . ', son parcours, son profil et sa présentation.',
             'skills' => array_slice($allSkills, 0, 6),
             'aboutStats' => $hasStats ? $aboutStats : [],
         ]));

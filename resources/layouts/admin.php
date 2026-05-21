@@ -12,6 +12,7 @@ $themeColor = trim((string) ($activeTheme['primary_color'] ?? '#ff4d4f'));
     <meta name='robots' content='noindex,nofollow'>
     <meta name='referrer' content='strict-origin-when-cross-origin'>
     <meta name='theme-color' content='<?= e($themeColor) ?>'>
+    <?php require RESOURCE_PATH . '/components/head-icons.php'; ?>
     <?php if ($fontStylesheetUrl = ThemeService::fontStylesheetUrl($activeTheme)): ?>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>

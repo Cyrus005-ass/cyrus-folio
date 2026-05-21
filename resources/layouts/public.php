@@ -14,7 +14,9 @@ $metaRobots = trim((string) ($metaRobots ?? app_config('robots', 'noindex,nofoll
 $canonical = trim((string) ($canonical ?? url(current_uri())));
 $metaType = trim((string) ($metaType ?? 'website'));
 $metaImage = absolute_url($metaImage ?? ($profile['avatar_url'] ?? app_config('og_image', ''))) ?? '';
+$metaImageAlt = trim((string) ($metaImageAlt ?? $fullTitle));
 $twitterHandle = trim((string) app_config('twitter_handle', ''));
+$twitterSite = trim((string) ($twitterSite ?? $twitterHandle));
 $activeTheme = ThemeService::activeTheme();
 $themeColor = trim((string) ($activeTheme['primary_color'] ?? app_config('theme_color', '#ff4d4f')));
 $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
@@ -22,8 +24,11 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
 <!doctype html>
 <html lang='<?= e($htmlLang) ?>'>
 <head>
+    <!-- Encodage & Responsive -->
     <meta charset='utf-8'>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+    <!-- SEO -->
     <title><?= e($fullTitle) ?></title>
     <meta name='description' content='<?= e($metaDescription) ?>'>
     <?php if ($fontStylesheetUrl = ThemeService::fontStylesheetUrl($activeTheme)): ?>
@@ -37,8 +42,14 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
     <meta name='robots' content='<?= e($metaRobots) ?>'>
     <meta name='referrer' content='strict-origin-when-cross-origin'>
     <meta name='theme-color' content='<?= e($themeColor) ?>'>
+
+    <!-- Favicons & App Icons -->
+    <?php require RESOURCE_PATH . '/components/head-icons.php'; ?>
+
+    <!-- Canonical -->
     <link rel='canonical' href='<?= e($canonical) ?>'>
 
+    <!-- Open Graph -->
     <meta property='og:locale' content='<?= e($locale) ?>'>
     <meta property='og:type' content='<?= e($metaType) ?>'>
     <meta property='og:site_name' content='<?= e($siteName) ?>'>
@@ -46,12 +57,19 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
     <meta property='og:description' content='<?= e($metaDescription) ?>'>
     <meta property='og:url' content='<?= e($canonical) ?>'>
     <?php if ($metaImage !== ''): ?><meta property='og:image' content='<?= e($metaImage) ?>'><?php endif; ?>
+    <?php if ($metaImage !== ''): ?><meta property='og:image:alt' content='<?= e($metaImageAlt) ?>'><?php endif; ?>
+    <?php if (str_starts_with($metaImage, 'https://')): ?><meta property='og:image:secure_url' content='<?= e($metaImage) ?>'><?php endif; ?>
 
+    <!-- Twitter Cards -->
     <meta name='twitter:card' content='<?= e($twitterCard) ?>'>
     <meta name='twitter:title' content='<?= e($fullTitle) ?>'>
     <meta name='twitter:description' content='<?= e($metaDescription) ?>'>
+    <?php if ($twitterSite !== ''): ?><meta name='twitter:site' content='<?= e($twitterSite) ?>'><?php endif; ?>
     <?php if ($twitterHandle !== ''): ?><meta name='twitter:creator' content='<?= e($twitterHandle) ?>'><?php endif; ?>
     <?php if ($metaImage !== ''): ?><meta name='twitter:image' content='<?= e($metaImage) ?>'><?php endif; ?>
+
+    <!-- Sécurité -->
+    <!-- La CSP est envoyée par en-tête HTTP dans app/Core/Bootstrap.php -->
 
     <style><?= ThemeService::cssVariables() ?></style>
     <link rel='stylesheet' href='<?= asset('css/main.css') ?>'>

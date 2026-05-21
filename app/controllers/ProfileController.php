@@ -6,6 +6,9 @@ use App\Core\Controller;
 use App\Core\Database;
 use App\Models\Profile;
 use App\Models\User;
+use App\Services\ActivityService;
+use App\Services\AuthService;
+use App\Services\TwoFactorService;
 use Throwable;
 
 class ProfileController extends Controller
@@ -13,7 +16,14 @@ class ProfileController extends Controller
     public function adminIndex(): void
     {
         $this->requireAdmin();
-        $this->view('admin/profile', ['profile' => (new Profile())->current(), 'user' => auth_user()], 'admin');
+
+        $userId = (int) (auth_user()['id'] ?? 0);
+        $user = (new User())->find($userId) ?: (auth_user() ?? []);
+        $this->view('admin/profile', [
+            'profile' => (new Profile())->current(),
+            'user' => $user,
+            'twoFactor' => $this->twoFactorData($user),
+        ], 'admin');
     }
 
     public function save(): void
@@ -67,7 +77,7 @@ class ProfileController extends Controller
             }
         }
         if (!in_array($data['availability'] ?? 'disponible', availability_options(), true)) {
-            $errors['availability'] = 'Disponibilite invalide.';
+            $errors['availability'] = 'Disponibilit? invalide.';
         }
         foreach (parse_named_links($data['other_links']) as $link) {
             if (!is_valid_url_or_empty($link['url'] ?? null)) {
@@ -78,7 +88,7 @@ class ProfileController extends Controller
 
         $existingUser = $userModel->findByEmail($data['email']);
         if ($existingUser && (int) $existingUser['id'] !== $userId) {
-            $errors['email'] = 'Cette adresse email est deja utilisee.';
+            $errors['email'] = 'Cette adresse email est d?j? utilis?e.';
         }
 
         if ($errors !== []) {
@@ -116,7 +126,7 @@ class ProfileController extends Controller
                 'email' => $data['email'],
             ]);
 
-            flash('success', 'Profil sauvegarde.');
+            flash('success', 'Profil sauvegard?.');
             redirect('/admin/profile');
         } catch (Throwable $e) {
             if ($pdo->inTransaction()) {
@@ -140,11 +150,115 @@ class ProfileController extends Controller
             $this->fail('Ancien mot de passe incorrect.', '/admin/profile', 422);
         }
         if ($password !== $confirmation || strlen($password) < 8) {
-            $this->fail('Mot de passe invalide ou confirmation differente.', '/admin/profile', 422);
+            $this->fail('Mot de passe invalide ou confirmation diff?rente.', '/admin/profile', 422);
         }
 
         (new User())->update((int) (auth_user()['id'] ?? 0), ['password' => password_hash($password, PASSWORD_DEFAULT)]);
-        flash('success', 'Mot de passe mis a jour.');
+        flash('success', 'Mot de passe mis ? jour.');
         redirect('/admin/profile');
+    }
+
+    public function enableTwoFactor(): void
+    {
+        $this->requireAdmin();
+        $this->validateCsrf();
+
+        $userId = (int) (auth_user()['id'] ?? 0);
+        $user = (new User())->find($userId);
+        $currentPassword = (string) ($_POST['current_password'] ?? '');
+        $secret = (string) ($_POST['two_factor_secret'] ?? '');
+        $code = (string) ($_POST['code'] ?? $_POST['two_factor_code'] ?? '');
+
+        if (!$user || !password_verify($currentPassword, (string) ($user['password'] ?? ''))) {
+            $this->fail('Mot de passe actuel incorrect.', '/admin/profile', 422);
+        }
+        if (TwoFactorService::enabledForUser($user)) {
+            $this->fail('La 2FA est d?j? activ?e sur ce compte.', '/admin/profile', 422);
+        }
+        if (!TwoFactorService::isValidSecret($secret)) {
+            $this->fail('Le secret 2FA g?n?r? est invalide. Recharge la page et r?essaie.', '/admin/profile', 422);
+        }
+        if (!TwoFactorService::verifyCode($secret, $code)) {
+            $this->fail('Le code 2FA saisi est invalide.', '/admin/profile', 422);
+        }
+
+        $confirmedAt = date('Y-m-d H:i:s');
+        (new User())->update($userId, [
+            'two_factor_secret' => strtoupper(preg_replace('/[^A-Z2-7]/', '', $secret) ?? ''),
+            'two_factor_enabled' => 1,
+            'two_factor_confirmed_at' => $confirmedAt,
+        ]);
+
+        AuthService::revokeRememberTokens($userId);
+        $_SESSION['user'] = array_merge(auth_user() ?? [], [
+            'id' => $userId,
+            'two_factor_enabled' => 1,
+            'two_factor_confirmed_at' => $confirmedAt,
+        ]);
+
+        ActivityService::log('two_factor_enabled', 'Activation de la 2FA sur le compte administrateur.', $userId);
+        flash('success', '2FA activ?e. Le remember me est d?sactiv? pour ?viter tout contournement.');
+        redirect('/admin/profile');
+    }
+
+    public function disableTwoFactor(): void
+    {
+        $this->requireAdmin();
+        $this->validateCsrf();
+
+        $userId = (int) (auth_user()['id'] ?? 0);
+        $user = (new User())->find($userId);
+        $currentPassword = (string) ($_POST['current_password'] ?? '');
+        $code = (string) ($_POST['code'] ?? $_POST['two_factor_code'] ?? '');
+
+        if (!$user || !password_verify($currentPassword, (string) ($user['password'] ?? ''))) {
+            $this->fail('Mot de passe actuel incorrect.', '/admin/profile', 422);
+        }
+        if (!TwoFactorService::enabledForUser($user)) {
+            $this->fail('La 2FA n\'est pas activ?e sur ce compte.', '/admin/profile', 422);
+        }
+        if (!TwoFactorService::verifyCode((string) ($user['two_factor_secret'] ?? ''), $code)) {
+            $this->fail('Le code 2FA saisi est invalide.', '/admin/profile', 422);
+        }
+
+        (new User())->update($userId, [
+            'two_factor_secret' => null,
+            'two_factor_enabled' => 0,
+            'two_factor_confirmed_at' => null,
+        ]);
+
+        $_SESSION['user'] = array_merge(auth_user() ?? [], [
+            'id' => $userId,
+            'two_factor_enabled' => 0,
+            'two_factor_confirmed_at' => null,
+        ]);
+
+        ActivityService::log('two_factor_disabled', 'D?sactivation de la 2FA sur le compte administrateur.', $userId);
+        flash('success', '2FA d?sactiv?e sur ce compte.');
+        redirect('/admin/profile');
+    }
+
+    private function twoFactorData(array $user): array
+    {
+        $account = trim((string) ($user['email'] ?? ($user['name'] ?? 'admin')));
+        $enabled = TwoFactorService::enabledForUser($user);
+        $data = [
+            'enabled' => $enabled,
+            'issuer' => TwoFactorService::issuer(),
+            'account' => $account !== '' ? $account : 'admin',
+            'confirmed_at' => $user['two_factor_confirmed_at'] ?? null,
+            'masked_secret' => $enabled ? TwoFactorService::maskSecret((string) ($user['two_factor_secret'] ?? '')) : '',
+        ];
+
+        if ($enabled) {
+            return $data;
+        }
+
+        $secret = TwoFactorService::generateSecret();
+        $data['secret'] = $secret;
+        $data['secret_formatted'] = TwoFactorService::formatSecret($secret);
+        $data['provisioning_uri'] = TwoFactorService::provisioningUri($secret, $data['account']);
+
+        return $data;
     }
 }

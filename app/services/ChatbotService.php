@@ -22,7 +22,7 @@ class ChatbotService
         $message = trim($message);
         if ($message === '') {
             return [
-                'answer' => 'Pose-moi une question sur le profil, les projets, les competences, les certifications ou le contact.',
+                'answer' => 'Pose-moi une question sur le profil, les projets, les compétences, les certifications ou le contact.',
                 'source' => 'local',
                 'remote_status' => 'empty_message',
                 'remote_code' => null,
@@ -556,7 +556,7 @@ class ChatbotService
     private function buildProfileAnswer(?array $profile): string
     {
         if (!is_array($profile) || $profile === []) {
-            return 'Le profil detaille nest pas encore disponible. Tu peux utiliser la page Contact pour demander plus dinformations.';
+            return 'Le profil détaillé n\'est pas encore disponible. Tu peux utiliser la page Contact pour demander plus d\'informations.';
         }
 
         $segments = [];
@@ -574,13 +574,13 @@ class ChatbotService
 
         return $answer !== ''
             ? $answer
-            : 'Je peux surtout te renseigner sur le profil, les projets, les competences, les certifications et le contact.';
+            : 'Je peux surtout te renseigner sur le profil, les projets, les compétences, les certifications et le contact.';
     }
 
     private function buildProjectsAnswer(array $projects): string
     {
         if ($projects === []) {
-            return 'Je nai pas encore de projets publics a proposer dans le portfolio.';
+            return 'Je n\'ai pas encore de projets publics à proposer dans le portfolio.';
         }
 
         $items = [];
@@ -596,22 +596,22 @@ class ChatbotService
         }
 
         return $items !== []
-            ? 'Voici quelques projets a retenir : ' . implode(' ; ', $items) . '.'
-            : 'Des projets sont bien presents, mais leurs descriptions sont encore trop courtes pour les resumer ici.';
+            ? 'Voici quelques projets ? retenir : ' . implode(' ; ', $items) . '.'
+            : 'Des projets sont bien pr?sents, mais leurs descriptions sont encore trop courtes pour les r?sumer ici.';
     }
 
     private function buildSkillsAnswer(array $skills): string
     {
         if ($skills === []) {
-            return 'Les competences ne sont pas encore renseignees dans le portfolio.';
+            return 'Les comp?tences ne sont pas encore renseign?es dans le portfolio.';
         }
 
         $names = array_values(array_filter(array_map(static fn (array $skill): string => trim((string) ($skill['nom'] ?? '')), $skills)));
         if ($names === []) {
-            return 'Les competences sont en cours de preparation.';
+            return 'Les comp?tences sont en cours de pr?paration.';
         }
 
-        return 'Competences mises en avant : ' . implode(', ', array_slice($names, 0, 8)) . '.';
+        return 'Comp?tences mises en avant : ' . implode(', ', array_slice($names, 0, 8)) . '.';
     }
 
     private function buildCertificationsAnswer(array $certifications): string
@@ -623,7 +623,7 @@ class ChatbotService
         $titles = array_values(array_filter(array_map(static fn (array $certification): string => trim((string) ($certification['titre'] ?? '')), $certifications)));
         return $titles !== []
             ? 'Certifications disponibles : ' . implode(', ', array_slice($titles, 0, 5)) . '.'
-            : 'Des certifications sont referencees, mais sans titre exploitable pour le moment.';
+            : 'Des certifications sont r?f?renc?es, mais sans titre exploitable pour le moment.';
     }
 
     private function buildContactAnswer(?array $profile): string
@@ -637,7 +637,7 @@ class ChatbotService
             $parts[] = 'email : ' . $profile['email'];
         }
         if (!empty($profile['phone'])) {
-            $parts[] = 'telephone : ' . $profile['phone'];
+            $parts[] = 't?l?phone : ' . $profile['phone'];
         }
         if (!empty($profile['website_url'])) {
             $websiteUrl = absolute_url((string) $profile['website_url']);
@@ -649,7 +649,7 @@ class ChatbotService
         $socialLinks = profile_social_links($profile);
         if ($socialLinks !== []) {
             $labels = array_map(static fn (array $link): string => (string) ($link['label'] ?? 'reseau social'), array_slice($socialLinks, 0, 4));
-            $parts[] = 'reseaux : ' . implode(', ', $labels);
+            $parts[] = 'r?seaux : ' . implode(', ', $labels);
         }
 
         return $parts !== []
@@ -661,10 +661,10 @@ class ChatbotService
     {
         $availability = trim((string) ($profile['availability'] ?? ''));
         if ($availability === '') {
-            return 'La disponibilite nest pas precisee pour le moment. Le plus simple est de demander via la page Contact.';
+            return 'La disponibilit? n est pas pr?cis?e pour le moment. Le plus simple est de demander via la page Contact.';
         }
 
-        return 'Disponibilite actuelle : ' . str_replace('_', ' ', $availability) . '.';
+        return 'Disponibilit? actuelle : ' . str_replace('_', ' ', $availability) . '.';
     }
 
     private function buildLocationAnswer(?array $profile): string
@@ -687,8 +687,8 @@ class ChatbotService
     {
         $videoUrl = absolute_url($profile['presentation_video_url'] ?? null) ?? '';
         return $videoUrl !== ''
-            ? 'La video de presentation est disponible depuis la page A propos et ici : ' . $videoUrl
-            : 'La video de presentation nest pas encore renseignee.';
+            ? 'La vid?o de pr?sentation est disponible depuis la page ? propos et ici : ' . $videoUrl
+            : 'La vid?o de pr?sentation n est pas encore renseign?e.';
     }
 
     private function buildGenericAnswer(?array $profile, array $projects, array $skills, array $certifications): string
@@ -699,14 +699,14 @@ class ChatbotService
             $topics[] = 'les projets';
         }
         if ($skills !== []) {
-            $topics[] = 'les competences';
+            $topics[] = 'les comp?tences';
         }
         if ($certifications !== []) {
             $topics[] = 'les certifications';
         }
         $topics[] = 'le contact';
 
-        return 'Je peux taider sur ' . ($name !== '' ? $name : 'ce portfolio') . ' : demande-moi par exemple le profil, ' . implode(', ', $topics) . '.';
+        return 'Je peux t\'aider sur ' . ($name !== '' ? $name : 'ce portfolio') . ' : demande-moi par exemple le profil, ' . implode(', ', $topics) . '.';
     }
 
     private function sanitizeHistory(array $history): array

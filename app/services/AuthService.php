@@ -11,65 +11,143 @@ class AuthService
 {
     private const REMEMBER_COOKIE = 'portfolio_os_remember';
     private const REMEMBER_TTL = 2592000;
+    private const TWO_FACTOR_PENDING_KEY = 'auth.two_factor_pending';
+    private const TWO_FACTOR_PENDING_TTL = 600;
 
     public static function login(string $email, string $password, bool $remember = false): bool
     {
-        $userModel = new User();
-        $user = $userModel->findByEmail($email);
-        if (!$user || !(int) $user['is_active'] || !password_verify($password, $user['password'])) {
+        $result = self::attemptLogin($email, $password, $remember);
+        if (!empty($result['requires_two_factor'])) {
+            self::clearTwoFactorChallenge();
             return false;
         }
 
-        self::storeSession($user);
-        $userModel->updateLastLogin((int) $user['id']);
+        return !empty($result['success']);
+    }
 
-        if ($remember) {
-            self::issueRememberToken((int) $user['id']);
-        } else {
-            self::forgetRememberedUser((int) $user['id']);
+    public static function attemptLogin(string $email, string $password, bool $remember = false): array
+    {
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+        if (!$user || !(int) ($user['is_active'] ?? 0) || !password_verify($password, (string) ($user['password'] ?? ''))) {
+            return [
+                'success' => false,
+                'requires_two_factor' => false,
+                'message' => 'Identifiants invalides',
+            ];
         }
 
-        ActivityService::log('login', 'Connexion administrateur');
-        return true;
+        return self::authorizeUser($user, $remember, 'local');
     }
 
     public static function logout(): void
     {
         $userId = (int) ($_SESSION['user']['id'] ?? 0);
         ActivityService::log('logout', 'Deconnexion administrateur');
+        self::clearTwoFactorChallenge();
         self::forgetRememberedUser($userId > 0 ? $userId : null);
         self::destroySession();
     }
 
     public static function loginWithFirebaseIdToken(string $idToken, bool $remember = false): bool
     {
+        $result = self::attemptFirebaseLogin($idToken, $remember);
+        if (!empty($result['requires_two_factor'])) {
+            self::clearTwoFactorChallenge();
+            return false;
+        }
+
+        return !empty($result['success']);
+    }
+
+    public static function attemptFirebaseLogin(string $idToken, bool $remember = false): array
+    {
         try {
             $claims = FirebaseService::verifyIdToken($idToken);
             $user = self::resolveFirebaseUser($claims);
         } catch (Throwable) {
-            return false;
+            return [
+                'success' => false,
+                'requires_two_factor' => false,
+                'message' => 'Jeton Firebase invalide ou utilisateur local non autorise',
+            ];
         }
 
         if (!$user || !(int) ($user['is_active'] ?? 0)) {
-            return false;
+            return [
+                'success' => false,
+                'requires_two_factor' => false,
+                'message' => 'Jeton Firebase invalide ou utilisateur local non autorise',
+            ];
         }
 
-        self::storeSession($user);
-        (new User())->updateLastLogin((int) $user['id']);
+        return self::authorizeUser($user, $remember, 'firebase');
+    }
 
-        if ($remember) {
-            self::issueRememberToken((int) $user['id']);
-        } else {
-            self::forgetRememberedUser((int) $user['id']);
+    public static function pendingTwoFactorUser(): ?array
+    {
+        $challenge = self::pendingTwoFactorChallenge();
+        if ($challenge === null) {
+            return null;
         }
 
-        ActivityService::log('login_firebase', 'Connexion administrateur via Firebase');
-        return true;
+        $user = (new User())->find((int) ($challenge['user_id'] ?? 0));
+        if (!$user || !(int) ($user['is_active'] ?? 0) || !TwoFactorService::enabledForUser($user)) {
+            self::clearTwoFactorChallenge();
+            return null;
+        }
+
+        return self::sanitizeSessionUser($user);
+    }
+
+    public static function completeTwoFactorLogin(string $code): array
+    {
+        $challenge = self::pendingTwoFactorChallenge();
+        if ($challenge === null) {
+            return [
+                'success' => false,
+                'expired' => true,
+                'message' => 'La verification 2FA a expire. Connecte-toi a nouveau.',
+            ];
+        }
+
+        $user = (new User())->find((int) ($challenge['user_id'] ?? 0));
+        if (!$user || !(int) ($user['is_active'] ?? 0) || !TwoFactorService::enabledForUser($user)) {
+            self::clearTwoFactorChallenge();
+            return [
+                'success' => false,
+                'expired' => true,
+                'message' => 'Le compte 2FA n est plus disponible. Reconnecte-toi.',
+            ];
+        }
+
+        if (!TwoFactorService::verifyCode((string) ($user['two_factor_secret'] ?? ''), $code)) {
+            ActivityService::log('two_factor_failed', 'Code 2FA invalide pendant la connexion.', (int) $user['id']);
+            return [
+                'success' => false,
+                'expired' => false,
+                'message' => 'Code de verification invalide.',
+            ];
+        }
+
+        self::finalizeLogin($user, (bool) ($challenge['remember'] ?? false), (string) ($challenge['driver'] ?? 'local'), true);
+
+        return [
+            'success' => true,
+            'expired' => false,
+            'auth_driver' => (string) ($challenge['driver'] ?? 'local'),
+            'user' => auth_user(),
+        ];
+    }
+
+    public static function revokeRememberTokens(int $userId): void
+    {
+        self::forgetRememberedUser($userId);
     }
 
     public static function restoreRememberedUser(): void
     {
-        if (auth_check()) {
+        if (auth_check() || self::hasPendingTwoFactor()) {
             return;
         }
 
@@ -96,7 +174,7 @@ class AuthService
         }
 
         $user = (new User())->find((int) $rememberToken['user_id']);
-        if (!$user || !(int) $user['is_active']) {
+        if (!$user || !(int) ($user['is_active'] ?? 0) || TwoFactorService::enabledForUser($user)) {
             $tokenModel->deleteBySelector($selector);
             self::clearRememberCookie();
             return;
@@ -131,6 +209,107 @@ class AuthService
 
         $userId = (int) Database::lastInsertId();
         self::ensureProfileExists($userId, $bootstrapAdmin['name'], $bootstrapAdmin['email']);
+    }
+
+    private static function authorizeUser(array $user, bool $remember, string $driver): array
+    {
+        if (TwoFactorService::enabledForUser($user)) {
+            self::beginTwoFactorChallenge($user, $remember, $driver);
+
+            return [
+                'success' => false,
+                'requires_two_factor' => true,
+                'message' => 'V?rification 2FA requise.',
+            ];
+        }
+
+        self::finalizeLogin($user, $remember, $driver, false);
+
+        return [
+            'success' => true,
+            'requires_two_factor' => false,
+            'auth_driver' => $driver,
+            'user' => auth_user(),
+        ];
+    }
+
+    private static function beginTwoFactorChallenge(array $user, bool $remember, string $driver): void
+    {
+        self::ensureSessionStarted();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return;
+        }
+
+        unset($_SESSION['user']);
+        $_SESSION[self::TWO_FACTOR_PENDING_KEY] = [
+            'user_id' => (int) ($user['id'] ?? 0),
+            'remember' => $remember,
+            'driver' => $driver,
+            'issued_at' => time(),
+        ];
+        session_regenerate_id(true);
+
+        ActivityService::log('two_factor_challenge', 'V?rification 2FA requise avant la connexion administrateur.', (int) ($user['id'] ?? 0));
+    }
+
+    private static function finalizeLogin(array $user, bool $remember, string $driver, bool $twoFactorVerified): void
+    {
+        self::clearTwoFactorChallenge();
+        self::storeSession($user);
+        (new User())->updateLastLogin((int) $user['id']);
+
+        $remember = $remember && !TwoFactorService::enabledForUser($user);
+        if ($remember) {
+            self::issueRememberToken((int) $user['id']);
+        } else {
+            self::forgetRememberedUser((int) $user['id']);
+        }
+
+        $action = $driver === 'firebase' ? 'login_firebase' : 'login';
+        $description = $driver === 'firebase'
+            ? 'Connexion administrateur via Firebase'
+            : 'Connexion administrateur';
+
+        if ($twoFactorVerified) {
+            $action .= '_2fa';
+            $description .= ' avec verification 2FA';
+        }
+
+        ActivityService::log($action, $description, (int) $user['id']);
+    }
+
+    private static function hasPendingTwoFactor(): bool
+    {
+        return self::pendingTwoFactorChallenge() !== null;
+    }
+
+    private static function pendingTwoFactorChallenge(): ?array
+    {
+        self::ensureSessionStarted();
+        if (session_status() !== PHP_SESSION_ACTIVE) {
+            return null;
+        }
+
+        $challenge = $_SESSION[self::TWO_FACTOR_PENDING_KEY] ?? null;
+        if (!is_array($challenge)) {
+            return null;
+        }
+
+        $userId = (int) ($challenge['user_id'] ?? 0);
+        $issuedAt = (int) ($challenge['issued_at'] ?? 0);
+        if ($userId <= 0 || $issuedAt <= 0 || ($issuedAt + self::TWO_FACTOR_PENDING_TTL) < time()) {
+            self::clearTwoFactorChallenge();
+            return null;
+        }
+
+        return $challenge;
+    }
+
+    private static function clearTwoFactorChallenge(): void
+    {
+        if (session_status() === PHP_SESSION_ACTIVE || self::ensureSessionStarted()) {
+            unset($_SESSION[self::TWO_FACTOR_PENDING_KEY]);
+        }
     }
 
     private static function resolveFirebaseUser(array $claims): ?array
@@ -205,8 +384,13 @@ class AuthService
         }
 
         session_regenerate_id(true);
-        unset($user['password']);
-        $_SESSION['user'] = $user;
+        $_SESSION['user'] = self::sanitizeSessionUser($user);
+    }
+
+    private static function sanitizeSessionUser(array $user): array
+    {
+        unset($user['password'], $user['two_factor_secret']);
+        return $user;
     }
 
     private static function issueRememberToken(int $userId): void
@@ -336,12 +520,17 @@ class AuthService
         return false;
     }
 
-    private static function ensureSessionStarted(): void
+    private static function ensureSessionStarted(): bool
     {
-        if (session_status() === PHP_SESSION_ACTIVE || headers_sent()) {
-            return;
+        if (session_status() === PHP_SESSION_ACTIVE) {
+            return true;
+        }
+
+        if (headers_sent()) {
+            return false;
         }
 
         session_start();
+        return session_status() === PHP_SESSION_ACTIVE;
     }
 }

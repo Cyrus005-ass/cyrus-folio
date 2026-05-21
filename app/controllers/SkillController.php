@@ -33,8 +33,8 @@ class SkillController extends Controller
         }
 
         $this->model->create($data);
-        ActivityService::log('skill.create', 'Creation competence ' . $data['nom']);
-        flash('success', 'Competence ajoutee.');
+        ActivityService::log('skill.create', 'Cr?ation comp?tence ' . $data['nom']);
+        flash('success', 'Comp?tence ajout?e.');
         redirect('/admin/skills');
     }
 
@@ -45,7 +45,7 @@ class SkillController extends Controller
 
         $skill = $this->model->find($id);
         if (!$skill) {
-            $this->fail('Competence introuvable.', '/admin/skills', 404);
+            $this->fail('Comp?tence introuvable.', '/admin/skills', 404);
         }
 
         $data = array_merge($skill, $this->payload($_POST, false));
@@ -55,8 +55,8 @@ class SkillController extends Controller
         }
 
         $this->model->update($id, $data);
-        ActivityService::log('skill.update', 'Mise a jour competence #' . $id);
-        flash('success', 'Competence mise a jour.');
+        ActivityService::log('skill.update', 'Mise ? jour comp?tence #' . $id);
+        flash('success', 'Comp?tence mise ? jour.');
         redirect('/admin/skills');
     }
 
@@ -66,12 +66,12 @@ class SkillController extends Controller
         $this->validateCsrf();
 
         if (!$this->model->find($id)) {
-            $this->fail('Competence introuvable.', '/admin/skills', 404);
+            $this->fail('Comp?tence introuvable.', '/admin/skills', 404);
         }
 
         $this->model->delete($id);
-        ActivityService::log('skill.delete', 'Suppression competence #' . $id);
-        flash('success', 'Competence supprimee.');
+        ActivityService::log('skill.delete', 'Suppression comp?tence #' . $id);
+        flash('success', 'Comp?tence supprim?e.');
         redirect('/admin/skills');
     }
 
@@ -103,7 +103,7 @@ class SkillController extends Controller
 
         $skill = $this->model->find($id);
         if (!$skill) {
-            $this->fail('Competence introuvable.', '/api/v1/skills', 404);
+            $this->fail('Comp?tence introuvable.', '/api/v1/skills', 404);
         }
 
         $data = array_merge($skill, $this->payload($this->input(), false));
@@ -121,7 +121,7 @@ class SkillController extends Controller
         $this->requireAdmin();
 
         if (!$this->model->find($id)) {
-            $this->fail('Competence introuvable.', '/api/v1/skills', 404);
+            $this->fail('Comp?tence introuvable.', '/api/v1/skills', 404);
         }
 
         $this->model->delete($id);
@@ -163,7 +163,7 @@ class SkillController extends Controller
     {
         $errors = validate_required($data, ['nom']);
         if (!in_array($data['categorie'] ?? 'Autre', skill_category_options(), true)) {
-            $errors['categorie'] = 'Categorie invalide.';
+            $errors['categorie'] = 'Cat?gorie invalide.';
         }
         if (!in_array($data['niveau'] ?? 'Intermediaire', skill_level_options(), true)) {
             $errors['niveau'] = 'Niveau invalide.';

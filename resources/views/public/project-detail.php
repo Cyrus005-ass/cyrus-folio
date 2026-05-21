@@ -1,4 +1,4 @@
-<section class='section page-shell'>
+<section class='section page-shell project-detail-page'>
     <div class='container'>
         <div class='page-hero card'>
             <div class='kicker'>Projet</div>
@@ -6,9 +6,9 @@
             <p class='lead'><?= e($project['description'] ?? '') ?></p>
 
             <div class='button-row'>
-                <a class='btn ghost' href='<?= url('/projects') ?>'>Retour</a>
+                <a class='btn ghost' href='<?= url('/projects') ?>'>Retour aux projets</a>
                 <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($project['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
+                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la démo</a><?php endif; ?>
             </div>
         </div>
 
@@ -23,11 +23,11 @@
             <?php endif; ?>
 
             <?php $galleryImages = decode_json_array($project['gallery_images'] ?? null); ?>
-            <?php if (!empty($project['image_url'])): ?><img src='<?= e(absolute_url($project['image_url'] ?? null) ?? '') ?>' alt='<?= e($project['titre'] ?? 'Projet') ?>' loading='eager' decoding='async' fetchpriority='high' style='max-height:360px;width:100%;object-fit:cover;border-radius:20px;'><?php endif; ?>
+            <?php if (!empty($project['image_url'])): ?><img class='detail-hero-media' src='<?= e(absolute_url($project['image_url'] ?? null) ?? '') ?>' alt='<?= e($project['titre'] ?? 'Projet') ?>' loading='eager' decoding='async' fetchpriority='high'><?php endif; ?>
             <?php if (!empty($galleryImages)): ?>
                 <div class='grid grid-3'>
                     <?php foreach ($galleryImages as $image): ?>
-                        <img src='<?= e(absolute_url($image) ?? '') ?>' alt='Image du projet' loading='lazy' decoding='async' fetchpriority='low' style='height:180px;width:100%;object-fit:cover;border-radius:18px;'>
+                        <img class='detail-gallery-media' src='<?= e(absolute_url($image) ?? '') ?>' alt='Image du projet' loading='lazy' decoding='async' fetchpriority='low'>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -40,7 +40,7 @@
                 <div class='section-head compact-head' style='margin-top:24px;'>
                     <div>
                         <div class='kicker'>Collaboration</div>
-                        <h2>Personnes mentionnees sur ce projet</h2>
+                        <h2>Personnes impliquées sur ce projet</h2>
                     </div>
                 </div>
                 <div class='grid grid-2'>

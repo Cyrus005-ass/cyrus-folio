@@ -1,7 +1,7 @@
 <?php
 $displayName = trim((string) (($profile['full_name'] ?? '') ?: 'Cyrus-y ASSOGBA'));
 $titleText = trim((string) (($profile['title'] ?? '') ?: 'Fullstack Developer'));
-$bioText = trim((string) (($profile['bio'] ?? '') ?: 'Je developpe des experiences web premium, administrables et pensees pour evoluer proprement.'));
+$bioText = trim((string) (($profile['bio'] ?? '') ?: 'Je développe des expériences web premium, administrables et pensées pour évoluer proprement.'));
 $profileImage = absolute_url($profile['avatar_url'] ?? null) ?? '';
 $cvUrl = absolute_url($profile['cv_url'] ?? null) ?? '';
 $websiteUrl = absolute_url($profile['website_url'] ?? null) ?? '';
@@ -13,9 +13,9 @@ $homeSkillGroups = is_array($homeSkillGroups ?? null) ? $homeSkillGroups : [];
 $homeStats = is_array($homeStats ?? null) ? $homeStats : [];
 $typedItems = array_values(array_unique(array_filter([
     $titleText,
-    'Developpeur backend',
-    'Integrateur frontend',
-    'Createur de solutions web',
+    'Développeur backend',
+    'Intégrateur front-end',
+    'Créateur de solutions web',
 ], static fn ($item) => trim((string) $item) !== '')));
 $typedItemsAttr = implode('|', $typedItems);
 
@@ -24,7 +24,7 @@ if (!empty($profile['location'])) {
     $overviewDetails[] = ['icon' => 'bi bi-geo-alt', 'label' => 'Base', 'value' => (string) $profile['location'], 'href' => null];
 }
 if (!empty($profile['availability'])) {
-    $overviewDetails[] = ['icon' => 'bi bi-briefcase', 'label' => 'Disponibilite', 'value' => ucfirst(str_replace('_', ' ', (string) $profile['availability'])), 'href' => null];
+    $overviewDetails[] = ['icon' => 'bi bi-briefcase', 'label' => 'Disponibilité', 'value' => ucfirst(str_replace('_', ' ', (string) $profile['availability'])), 'href' => null];
 }
 if (!empty($profile['email'])) {
     $overviewDetails[] = ['icon' => 'bi bi-envelope', 'label' => 'Email', 'value' => (string) $profile['email'], 'href' => 'mailto:' . (string) $profile['email']];
@@ -35,18 +35,18 @@ if ($websiteUrl !== '') {
 $overviewDetails = array_slice($overviewDetails, 0, 4);
 
 $serviceMeta = [
-    'Frameworks' => ['icon' => 'bi bi-window-stack', 'description' => 'Des interfaces, applications et experiences web modernes, fluides et evolutives.'],
+    'Frameworks' => ['icon' => 'bi bi-window-stack', 'description' => 'Des interfaces, applications et expériences web modernes, fluides et évolutives.'],
     'Langages' => ['icon' => 'bi bi-code-slash', 'description' => 'Des fondations techniques propres pour construire vite, bien et durablement.'],
-    'Outils' => ['icon' => 'bi bi-gear-wide-connected', 'description' => 'Un environnement de production structure pour livrer plus proprement et plus sereinement.'],
-    'Securite' => ['icon' => 'bi bi-shield-check', 'description' => 'Une attention concrete a la fiabilite, a la protection et a la qualite globale du produit.'],
-    'Autre' => ['icon' => 'bi bi-layers', 'description' => 'Des competences complementaires utiles pour faire avancer un produit dans son ensemble.'],
+    'Outils' => ['icon' => 'bi bi-gear-wide-connected', 'description' => 'Un environnement de production structuré pour livrer plus proprement et plus sereinement.'],
+    'Securite' => ['icon' => 'bi bi-shield-check', 'description' => 'Une attention concrète à la fiabilité, à la protection et à la qualité globale du produit.'],
+    'Autre' => ['icon' => 'bi bi-layers', 'description' => 'Des compétences complémentaires utiles pour faire avancer un produit dans son ensemble.'],
 ];
 
 $serviceCards = [];
 foreach ($homeSkillGroups as $category => $items) {
-    $meta = $serviceMeta[(string) $category] ?? ['icon' => 'bi bi-stars', 'description' => 'Une expertise adaptable aux besoins du projet et a son niveau de maturite.'];
+    $meta = $serviceMeta[(string) $category] ?? ['icon' => 'bi bi-stars', 'description' => 'Une expertise adaptable aux besoins du projet et à son niveau de maturité.'];
     $serviceCards[] = [
-        'title' => (string) $category,
+        'title' => skill_category_label((string) $category),
         'description' => $meta['description'],
         'icon' => $meta['icon'],
         'count' => count($items),
@@ -56,9 +56,9 @@ foreach ($homeSkillGroups as $category => $items) {
 
 if ($serviceCards === []) {
     $serviceCards = [
-        ['title' => 'Design & interfaces', 'description' => 'Des ecrans sobres, clairs et premium qui servent vraiment le contenu et la conversion.', 'icon' => 'bi bi-grid-1x2', 'count' => 3, 'tags' => ['UI premium', 'Responsive', 'Direction visuelle']],
-        ['title' => 'Developpement web', 'description' => 'Des experiences web rapides, administrables et faciles a faire evoluer proprement.', 'icon' => 'bi bi-code-square', 'count' => 3, 'tags' => ['Frontend', 'Backend', 'Architecture']],
-        ['title' => 'Livraison produit', 'description' => 'Une execution structuree avec de bons choix techniques, du confort admin et un rendu soigne.', 'icon' => 'bi bi-rocket-takeoff', 'count' => 3, 'tags' => ['Qualite', 'Maintenance', 'Performance']],
+        ['title' => 'Design & interfaces', 'description' => 'Des écrans sobres, clairs et premium qui servent vraiment le contenu et la conversion.', 'icon' => 'bi bi-grid-1x2', 'count' => 3, 'tags' => ['UI premium', 'Responsive', 'Direction visuelle']],
+        ['title' => 'Développement web', 'description' => 'Des expériences web rapides, administrables et faciles à faire évoluer proprement.', 'icon' => 'bi bi-code-square', 'count' => 3, 'tags' => ['Frontend', 'Backend', 'Architecture']],
+        ['title' => 'Livraison produit', 'description' => 'Une exécution structurée avec de bons choix techniques, du confort admin et un rendu soigné.', 'icon' => 'bi bi-rocket-takeoff', 'count' => 3, 'tags' => ['Qualité', 'Maintenance', 'Performance']],
     ];
 }
 ?>
@@ -73,7 +73,7 @@ if ($serviceCards === []) {
             <span class='typed-text' data-typed-items='<?= e($typedItemsAttr) ?>'><?= e($typedItems[0] ?? $titleText) ?></span>
             <span class='typed-cursor' aria-hidden='true'>|</span>
         </p>
-        <p class='hero-summary'>Je developpe des experiences web premium, administrables et pensees pour evoluer proprement, avec un vrai soin du rendu et de la structure.</p>
+        <p class='hero-summary'>Je développe des expériences web premium, administrables et pensées pour évoluer proprement, avec un vrai soin du rendu et de la structure.</p>
 
         <?php if ($socialLinks !== []): ?>
             <div class='social-links'>
@@ -91,10 +91,10 @@ if ($serviceCards === []) {
 <section class='section home-intro-section'>
     <div class='container home-intro-grid'>
         <article class='intro-story card' data-reveal>
-            <div class='section-tag'>About</div>
-            <h2>Un profil fullstack oriente produit, execution et rendu premium.</h2>
+            <div class='section-tag'>À propos</div>
+            <h2>Un profil fullstack orienté produit, exécution et rendu premium.</h2>
             <p class='lead'><?= e($bioText) ?></p>
-            <p class='intro-copy'>Je travaille avec une approche claire : comprendre le besoin, poser une structure solide, puis livrer une experience visuelle sobre, moderne et simple a faire evoluer.</p>
+            <p class='intro-copy'>Je travaille avec une approche claire : comprendre le besoin, poser une structure solide, puis livrer une expérience visuelle sobre, moderne et simple à faire évoluer.</p>
             <div class='button-row'>
                 <a class='btn' href='<?= url('/about') ?>'>Lire le profil complet</a>
                 <a class='btn ghost' href='<?= url('/contact') ?>'>Parler de ton projet</a>
@@ -104,7 +104,7 @@ if ($serviceCards === []) {
 
         <aside class='overview-panel card' data-reveal style='--reveal-delay: 120ms;'>
             <div class='overview-panel-head'>
-                <div class='section-tag'>Resume</div>
+                <div class='section-tag'>Résumé</div>
                 <h3>En bref</h3>
             </div>
 
@@ -138,7 +138,7 @@ if ($serviceCards === []) {
                     <?php endforeach; ?>
                 </div>
             <?php else: ?>
-                <p class='meta'>Le profil detaille, les informations completes et la video de presentation restent centralises sur la page A propos.</p>
+                <p class='meta'>Le profil détaillé, les informations complètes et la vidéo de présentation restent centralisés sur la page À propos.</p>
             <?php endif; ?>
         </aside>
     </div>
@@ -149,10 +149,10 @@ if ($serviceCards === []) {
         <div class='section-head' data-reveal>
             <div>
                 <div class='kicker'>Services</div>
-                <h2>Une approche claire du design a la livraison</h2>
-                <p class='lead'>L'accueil montre ici un apercu propre des expertises principales, sans remonter toute la page competences dans son integralite.</p>
+                <h2>Une approche claire du design à la livraison</h2>
+                <p class='lead'>L'accueil montre ici un aperçu propre des expertises principales, sans remonter toute la page compétences dans son intégralité.</p>
             </div>
-            <a class='btn ghost' href='<?= url('/skills') ?>'>Voir les competences</a>
+            <a class='btn ghost' href='<?= url('/skills') ?>'>Voir les compétences</a>
         </div>
 
         <div class='service-preview-grid'>
@@ -162,7 +162,7 @@ if ($serviceCards === []) {
                         <span class='service-preview-icon'><i class='<?= e($card['icon']) ?>' aria-hidden='true'></i></span>
                         <span class='service-preview-count'><?= e(str_pad((string) ($index + 1), 2, '0', STR_PAD_LEFT)) ?></span>
                     </div>
-                    <span class='service-preview-meta'><?= e((string) $card['count']) ?> repere(s)</span>
+                    <span class='service-preview-meta'><?= e((string) $card['count']) ?> repère(s)</span>
                     <h3><?= e($card['title']) ?></h3>
                     <p><?= e($card['description']) ?></p>
                     <?php if (!empty($card['tags'])): ?>
@@ -180,7 +180,7 @@ if ($serviceCards === []) {
             <div class='stack-ribbon card' data-reveal style='--reveal-delay: 240ms;'>
                 <div>
                     <div class='kicker'>Stack</div>
-                    <h3>Technologies que j'utilise regulierement</h3>
+                    <h3>Technologies que j'utilise régulièrement</h3>
                 </div>
                 <div class='skill-chip-grid'>
                     <?php foreach ($homeSkills as $skill): ?>
@@ -202,8 +202,8 @@ if ($serviceCards === []) {
         <div class='section-head' data-reveal>
             <div>
                 <div class='kicker'>Portfolio</div>
-                <h2>Une selection de projets a explorer</h2>
-                <p class='lead'>Quelques realisations choisies pour offrir un apercu plus vivant du portfolio, sans transformer l'accueil en catalogue complet.</p>
+                <h2>Une sélection de projets à explorer</h2>
+                <p class='lead'>Quelques réalisations choisies pour offrir un aperçu plus vivant du portfolio, sans transformer l'accueil en catalogue complet.</p>
             </div>
             <a class='btn ghost' href='<?= url('/projects') ?>'>Tous les projets</a>
         </div>
@@ -222,8 +222,8 @@ if ($serviceCards === []) {
 
                     <div class='portfolio-copy'>
                         <div class='split-line'>
-                            <span class='tag'><?= e($project['statut'] ?? 'publie') ?></span>
-                            <?php if (!empty($project['demo_url'])): ?><span class='meta'>Demo dispo</span><?php endif; ?>
+                            <span class='tag'><?= e(publication_status_label($project['statut'] ?? '')) ?></span>
+                            <?php if (!empty($project['demo_url'])): ?><span class='meta'>Démo dispo</span><?php endif; ?>
                         </div>
 
                         <h3><?= e($project['titre']) ?></h3>
@@ -238,9 +238,9 @@ if ($serviceCards === []) {
                         <?php endif; ?>
 
                         <div class='button-row'>
-                            <a class='btn ghost' href='<?= url('/projects/' . ($project['slug'] ?? '')) ?>'>Details</a>
+                            <a class='btn ghost' href='<?= url('/projects/' . ($project['slug'] ?? '')) ?>'>Détails</a>
                             <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($project['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                            <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
+                            <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la démo</a><?php endif; ?>
                         </div>
                     </div>
                 </article>
@@ -255,11 +255,11 @@ if ($serviceCards === []) {
         <div class='cta-banner' data-reveal>
             <div>
                 <div class='kicker'>Contact</div>
-                <h2>Tu veux voir tout le parcours, mes reseaux et la video de presentation ?</h2>
-                <p>La page A propos regroupe la presentation complete du profil et la video. Pour parler d'une mission ou d'un projet, la page Contact reste la meilleure entree.</p>
+                <h2>Tu veux voir tout le parcours, mes réseaux et la vidéo de présentation ?</h2>
+                <p>La page À propos regroupe la présentation complète du profil et la vidéo. Pour parler d'une mission ou d'un projet, la page Contact reste la meilleure entrée.</p>
             </div>
             <div class='button-row'>
-                <a class='btn' href='<?= url('/about') ?>'>Voir A propos</a>
+                <a class='btn' href='<?= url('/about') ?>'>Voir À propos</a>
                 <a class='btn ghost' href='<?= url('/contact') ?>'>Lancer une discussion</a>
                 <a class='btn ghost' href='<?= url('/projects') ?>'>Explorer le portfolio</a>
             </div>

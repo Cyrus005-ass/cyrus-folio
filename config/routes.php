@@ -33,6 +33,8 @@ $router->get('/about', [PublicController::class, 'about']);
 // Auth admin
 $router->get('/admin/login', [AuthController::class, 'loginForm']);
 $router->post('/admin/login', [AuthController::class, 'login']);
+$router->get('/admin/2fa/verify', [AuthController::class, 'twoFactorForm']);
+$router->post('/admin/2fa/verify', [AuthController::class, 'twoFactorVerify']);
 $router->post('/admin/logout', [AuthController::class, 'logout']);
 
 // Admin
@@ -88,9 +90,12 @@ $router->post('/admin/chatbot/test', [ChatbotController::class, 'testMessage']);
 $router->get('/admin/profile', [ProfileController::class, 'adminIndex']);
 $router->post('/admin/profile', [ProfileController::class, 'save']);
 $router->post('/admin/profile/password', [ProfileController::class, 'password']);
+$router->post('/admin/profile/2fa/enable', [ProfileController::class, 'enableTwoFactor']);
+$router->post('/admin/profile/2fa/disable', [ProfileController::class, 'disableTwoFactor']);
 
 // API REST v1
 $router->post('/api/v1/auth/login', [AuthController::class, 'login']);
+$router->post('/api/v1/auth/2fa', [AuthController::class, 'twoFactorVerify']);
 $router->post('/api/v1/auth/logout', [AuthController::class, 'logout']);
 
 $router->get('/api/v1/projects', [ProjectController::class, 'indexApi']);

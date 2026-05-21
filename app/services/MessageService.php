@@ -37,12 +37,12 @@ class MessageService
             ]);
 
             if (($response['status'] ?? 500) < 200 || ($response['status'] ?? 500) >= 300) {
-                throw new RuntimeException(self::responseError($response, 'La synchro Firestore du message a echoue.'));
+                throw new RuntimeException(self::responseError($response, 'La synchro Firestore du message a ?chou?.'));
             }
 
             return self::result(true, true, $messageId, null);
         } catch (Throwable $e) {
-            ActivityService::log('firebase.messages.sync_failed', 'Echec de synchro Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
+            ActivityService::log('firebase.messages.sync_failed', '?chec de synchro Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
             return self::result(true, false, $messageId, $e->getMessage());
         }
     }
@@ -90,12 +90,12 @@ class MessageService
             }
 
             if ($status < 200 || $status >= 300) {
-                throw new RuntimeException(self::responseError($response, 'La suppression Firestore du message a echoue.'));
+                throw new RuntimeException(self::responseError($response, 'La suppression Firestore du message a ?chou?.'));
             }
 
             return self::result(true, true, $messageId, null);
         } catch (Throwable $e) {
-            ActivityService::log('firebase.messages.delete_failed', 'Echec de suppression Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
+            ActivityService::log('firebase.messages.delete_failed', '?chec de suppression Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
             return self::result(true, false, $messageId, $e->getMessage());
         }
     }
@@ -114,7 +114,7 @@ class MessageService
             ]);
 
             if (($response['status'] ?? 500) < 200 || ($response['status'] ?? 500) >= 300) {
-                throw new RuntimeException(self::responseError($response, 'Impossible de recuperer les messages live.'));
+                throw new RuntimeException(self::responseError($response, 'Impossible de r?cup?rer les messages live.'));
             }
 
             $documents = $response['data']['documents'] ?? [];
@@ -131,7 +131,7 @@ class MessageService
 
             return $messages;
         } catch (Throwable $e) {
-            ActivityService::log('firebase.messages.fetch_failed', 'Echec de lecture Firestore des messages : ' . $e->getMessage());
+            ActivityService::log('firebase.messages.fetch_failed', '?chec de lecture Firestore des messages : ' . $e->getMessage());
             return [];
         }
     }
@@ -151,12 +151,12 @@ class MessageService
             }
 
             if ($status < 200 || $status >= 300 || !is_array($response['data'] ?? null)) {
-                throw new RuntimeException(self::responseError($response, 'Impossible de recuperer le message live.'));
+                throw new RuntimeException(self::responseError($response, 'Impossible de r?cup?rer le message live.'));
             }
 
             return self::mapDocument($response['data']);
         } catch (Throwable $e) {
-            ActivityService::log('firebase.messages.find_failed', 'Echec de lecture Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
+            ActivityService::log('firebase.messages.find_failed', '?chec de lecture Firestore pour le message #' . $messageId . ' : ' . $e->getMessage());
             return null;
         }
     }

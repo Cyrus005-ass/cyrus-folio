@@ -7,6 +7,7 @@ RewriteRule ^(app|config|database|resources|storage|vendor)/ - [F,L]
 # Sert les fichiers statiques du dossier public sans exposer les autres repertoires.
 RewriteRule ^(assets/.+)$ public/$1 [L,NC]
 RewriteRule ^(favicon\.ico|robots\.txt)$ public/$1 [L,NC]
+RewriteRule ^cript\.php$ public/cript.php [L,NC]
 
 # Route toutes les URL applicatives vers le front-controller racine.
 RewriteCond %{REQUEST_FILENAME} !-f

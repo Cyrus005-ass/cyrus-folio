@@ -92,13 +92,16 @@ document.addEventListener('DOMContentLoaded', () => {
     input.value = '';
     autoResize();
 
-    const pending = addBubble('Je prepare une reponse...', false, false, true);
+    const pending = addBubble('Je prépare une réponse...', false, false, true);
     setBusy(true);
 
     try {
       const response = await fetch(endpoint, {
         method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
         headers: {
+          'Accept': 'application/json',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -114,18 +117,22 @@ document.addEventListener('DOMContentLoaded', () => {
         data = null;
       }
 
-      pending.remove();
+      if (pending.parentNode) {
+        pending.remove();
+      }
       setBusy(false);
       input.focus();
 
       if (!response.ok) {
-        addBubble((data && data.message) || 'Le chatbot ne repond pas correctement pour le moment.');
+        addBubble((data && data.message) || 'Le chatbot ne répond pas correctement pour le moment.');
         return;
       }
 
-      addBubble((data && data.answer) || 'Reponse indisponible.');
+      addBubble((data && data.answer) || 'Réponse indisponible.');
     } catch (_error) {
-      pending.remove();
+      if (pending.parentNode) {
+        pending.remove();
+      }
       setBusy(false);
       input.focus();
       addBubble('Impossible de joindre le chatbot pour le moment.');

@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const markBusy = (value) => {
     busy = value;
     refresh.disabled = value;
-    refresh.textContent = value ? 'Actualisation...' : 'Rafraichir';
+    refresh.textContent = value ? 'Actualisation...' : 'Rafra?chir';
   };
 
   const sourceBadge = (message) => {
@@ -117,7 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return [
       "<div class='actions'>",
       `<a class='btn ghost' href='${detailUrl}'>Lire</a>`,
-      `<a class='btn ghost' href='${mailtoUrl}'>Repondre</a>`,
+      `<a class='btn ghost' href='${mailtoUrl}'>R?pondre</a>`,
       unread
         ? [
           `<form method='post' action='${readAction}'>`,
@@ -209,15 +209,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const liveEnabled = Boolean(payload.live_enabled);
 
     if (liveEnabled) {
-      summary.textContent = `${messages.length} message(s) affiches. ${archiveCount} archive(s) MySQL et ${liveCount} element(s) live Firestore consultes.`;
-      setBadge(status, 'Flux fusionne actif', 'blue');
+      summary.textContent = `${messages.length} message(s) affich?s. ${archiveCount} archive(s) MySQL et ${liveCount} ?l?ment(s) live Firestore consult?s.`;
+      setBadge(status, 'Flux fusionn? actif', 'blue');
     } else {
-      summary.textContent = `${messages.length} message(s) affiches depuis l'archive MySQL. Firestore est desactive ou non configure pour ce module.`;
+      summary.textContent = `${messages.length} message(s) affich?s depuis l'archive MySQL. Firestore est d?sactiv? ou non configur? pour ce module.`;
       setBadge(status, 'Archive uniquement');
     }
 
     const lastSync = formatDate(payload.last_sync_at || new Date().toISOString());
-    setBadge(sync, `Derniere synchro ${lastSync}`);
+    setBadge(sync, `Derni?re synchro ${lastSync}`);
   };
 
   const schedule = () => {
@@ -272,9 +272,9 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (error) {
       const message = error instanceof Error && error.message.trim() !== ''
         ? error.message.trim()
-        : 'Impossible de recuperer les messages.';
+        : 'Impossible de r?cup?rer les messages.';
       setBadge(status, 'Synchro indisponible', 'red');
-      setBadge(sync, 'Derniere synchro indisponible');
+      setBadge(sync, 'Derni?re synchro indisponible');
       summary.textContent = message;
     } finally {
       markBusy(false);

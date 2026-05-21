@@ -12,7 +12,7 @@ $messageSourceLabel = match ($messageSource) {
         <div>
             <div class='kicker'>Message de contact</div>
             <h2><?= e($message['sujet'] ?? 'Message') ?></h2>
-            <p class='meta'>Recu le <?= e($message['created_at'] ?? '') ?></p>
+            <p class='meta'>Re?u le <?= e($message['created_at'] ?? '') ?></p>
             <p class='meta'>Flux <?= e($messageSourceLabel) ?></p>
         </div>
         <?php if (($message['statut'] ?? 'nouveau') === 'lu'): ?><span class='badge green'>Lu</span><?php else: ?><span class='badge red'>Non lu</span><?php endif; ?>
@@ -25,7 +25,7 @@ $messageSourceLabel = match ($messageSource) {
     </div>
     <div class='actions'>
         <a class='btn ghost' href='<?= url('/admin/messages') ?>'>Retour</a>
-        <a class='btn ghost' href='mailto:<?= e($message['email']) ?>?subject=<?= rawurlencode('Re: ' . ($message['sujet'] ?? '')) ?>'>Repondre</a>
+        <a class='btn ghost' href='mailto:<?= e($message['email']) ?>?subject=<?= rawurlencode('Re: ' . ($message['sujet'] ?? '')) ?>'>R?pondre</a>
         <form method='post' action='<?= url('/admin/messages/' . $message['id']) ?>'>
             <?= csrf_field() ?>
             <?= method_field('DELETE') ?>

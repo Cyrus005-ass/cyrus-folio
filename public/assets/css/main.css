@@ -3720,3 +3720,503 @@ body {
         padding: 16px;
     }
 }
+
+/* Public density adjustments */
+.brand {
+    gap: 0;
+}
+
+.navbar .nav-inner,
+.inner-page .navbar .nav-inner,
+.navbar.scrolled .nav-inner {
+    padding: 12px 20px;
+    gap: 20px;
+}
+
+.brand-mark,
+.brand-emblem {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
+    flex: 0 0 auto;
+}
+
+.brand-mark {
+    font-size: 1rem;
+    letter-spacing: 0.04em;
+}
+
+.nav-links {
+    align-items: center;
+    gap: 2px;
+}
+
+.nav-links a {
+    padding: 14px 14px;
+    font-size: 0.96rem;
+}
+
+.nav-links .nav-cta {
+    margin-left: 14px;
+    min-width: 128px;
+    padding: 12px 24px;
+}
+
+.footer-brand {
+    max-width: 430px;
+}
+
+.footer-brand h2 {
+    font-size: clamp(2.2rem, 3.4vw, 3.2rem);
+    line-height: 1.02;
+}
+
+.footer-brand p {
+    max-width: 34ch;
+}
+
+.blog-page .page-hero,
+.projects-page .page-hero,
+.skills-page .page-hero,
+.certifications-page .page-hero,
+.blog-detail-page .page-hero,
+.project-detail-page .page-hero {
+    margin-bottom: 22px;
+    padding: 24px 28px;
+}
+
+.blog-page .page-hero h1,
+.projects-page .page-hero h1,
+.skills-page .page-hero h1,
+.certifications-page .page-hero h1,
+.blog-detail-page .page-hero h1,
+.project-detail-page .page-hero h1 {
+    font-size: clamp(2rem, 4vw, 3rem);
+}
+
+.blog-page .page-hero .lead,
+.projects-page .page-hero .lead,
+.skills-page .page-hero .lead,
+.certifications-page .page-hero .lead {
+    max-width: 58ch;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
+}
+
+.blog-card {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    border-radius: 24px;
+}
+
+.blog-card-media {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.blog-card-body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.blog-card .tag {
+    width: fit-content;
+}
+
+.blog-card h2 {
+    margin: 0;
+    font-size: clamp(1.55rem, 2.25vw, 2rem);
+    line-height: 1.24;
+}
+
+.blog-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    margin-top: auto;
+}
+
+.blog-card-date {
+    margin-left: auto;
+    color: var(--text-faint);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.blog-card .btn {
+    min-width: 86px;
+}
+
+.projects-grid {
+    gap: 20px;
+}
+
+.project-list-card {
+    border-radius: 24px;
+}
+
+.projects-page .portfolio-media {
+    aspect-ratio: 16 / 10.2;
+}
+
+.projects-page .portfolio-copy {
+    gap: 12px;
+    padding: 20px;
+}
+
+.projects-page .portfolio-copy h3 {
+    font-size: clamp(1.35rem, 2.2vw, 1.8rem);
+}
+
+.projects-page .portfolio-copy .meta {
+    font-size: 0.94rem;
+}
+
+.projects-page .tags {
+    gap: 8px;
+}
+
+.projects-page .tag {
+    padding: 7px 11px;
+}
+
+.skills-grid {
+    gap: 20px;
+}
+
+.skills-group-card {
+    padding: 24px;
+}
+
+.skills-group-card h2 {
+    margin-bottom: 18px;
+    font-size: 1.7rem;
+}
+
+.skills-page .stack-list {
+    gap: 14px;
+}
+
+.skills-page .skills-group-card,
+.skills-page .skill-item {
+    background: color-mix(in srgb, var(--secondary), #ffffff 4%);
+    border-color: color-mix(in srgb, var(--primary), transparent 84%);
+}
+
+.skills-page .skill-item {
+    padding: 18px;
+    border-radius: 18px;
+    border: 1px solid color-mix(in srgb, var(--primary), transparent 84%);
+}
+
+.skills-page .skills-group-card h2,
+.skills-page .split-line strong {
+    color: var(--text-strong);
+}
+
+.skills-page .split-line .meta,
+.skills-page .skill-item .meta {
+    color: var(--text-soft);
+}
+
+.skills-page .skill-item .meta {
+    margin: 10px 0 0;
+}
+
+.skills-page .progress {
+    margin: 12px 0 0;
+    height: 10px;
+    background: color-mix(in srgb, var(--text), transparent 92%);
+}
+
+.detail-hero-media {
+    width: 100%;
+    max-height: 320px;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.blog-detail-page .detail-hero-media {
+    max-height: 300px;
+}
+
+.detail-gallery-media {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    border-radius: 18px;
+}
+
+.blog-detail-page .detail-shell,
+.project-detail-page .detail-shell {
+    gap: 18px;
+    padding: 24px;
+}
+
+.project-detail-page .grid.grid-3 {
+    gap: 16px;
+}
+
+.about-page .content-wrapper .bio-section h2 {
+    font-size: clamp(1.9rem, 3.7vw, 2.8rem);
+}
+
+.about-video-card {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.about-video-card .video-shell {
+    aspect-ratio: 16 / 8.7;
+    max-height: 380px;
+}
+
+.certifications-page .cert-row {
+    padding: 24px;
+}
+
+@media (max-width: 980px) {
+    .navbar .nav-inner,
+    .inner-page .navbar .nav-inner,
+    .navbar.scrolled .nav-inner {
+        padding: 12px 16px;
+        gap: 16px;
+    }
+
+    .nav-links .nav-cta {
+        width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-top: 8px;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-card-media {
+        height: 180px;
+    }
+
+    .blog-card-footer {
+        flex-direction: column-reverse;
+        align-items: flex-start;
+    }
+
+    .blog-card-date {
+        margin-left: 0;
+    }
+
+    .projects-page .portfolio-media {
+        aspect-ratio: 16 / 10;
+    }
+
+    .about-video-card {
+        padding: 20px;
+    }
+
+    .footer-brand h2 {
+        font-size: clamp(1.9rem, 9vw, 2.5rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar .nav-inner,
+    .inner-page .navbar .nav-inner,
+    .navbar.scrolled .nav-inner {
+        padding: 10px 14px;
+    }
+
+    .brand-mark,
+    .brand-emblem {
+        width: 46px;
+        height: 46px;
+    }
+
+    .nav-links a {
+        padding: 12px 10px;
+    }
+
+    .blog-page .page-hero,
+    .projects-page .page-hero,
+    .skills-page .page-hero,
+    .certifications-page .page-hero,
+    .blog-detail-page .page-hero,
+    .project-detail-page .page-hero,
+    .about-video-card,
+    .skills-group-card,
+    .blog-card {
+        padding: 20px;
+    }
+
+    .projects-page .portfolio-copy {
+        padding: 18px;
+    }
+}
+
+/* Public polish overrides */
+.brand-logo-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand-emblem-static {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+.nav-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 12px 14px;
+    border-radius: 999px;
+}
+
+.footer-brand h2 {
+    font-size: clamp(1.95rem, 3vw, 2.7rem);
+}
+
+.blog-grid {
+    gap: 18px;
+}
+
+.blog-card {
+    gap: 12px;
+    padding: 16px;
+    border-radius: 22px;
+}
+
+.blog-card-media {
+    height: 186px;
+    border-radius: 18px;
+}
+
+.blog-card-body {
+    gap: 12px;
+}
+
+.blog-card h2 {
+    font-size: clamp(1.35rem, 2vw, 1.72rem);
+}
+
+.blog-card .meta {
+    font-size: 0.92rem;
+}
+
+.blog-card-footer {
+    flex-wrap: wrap;
+}
+
+.blog-card-date {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+}
+
+.blog-card .btn {
+    min-width: 94px;
+    margin-left: auto;
+}
+
+.projects-grid {
+    gap: 18px;
+}
+
+.project-list-card {
+    border-radius: 22px;
+}
+
+.projects-page .portfolio-media {
+    aspect-ratio: 16 / 9.4;
+}
+
+.projects-page .portfolio-copy {
+    gap: 10px;
+    padding: 18px;
+}
+
+.projects-page .portfolio-copy h3 {
+    font-size: clamp(1.2rem, 1.9vw, 1.55rem);
+}
+
+.projects-page .button-row {
+    gap: 10px;
+}
+
+.projects-page .button-row .btn {
+    padding: 10px 16px;
+}
+
+.skills-page .skills-group-card,
+.skills-page .skill-item {
+    background: color-mix(in srgb, var(--surface), #ffffff 10%);
+    border-color: color-mix(in srgb, var(--primary), #ffffff 16%);
+}
+
+.skills-page .skill-item {
+    border: 1px solid color-mix(in srgb, var(--primary), #ffffff 16%);
+}
+
+.skills-page .split-line .meta,
+.skills-page .skill-item .meta {
+    color: color-mix(in srgb, var(--text), #ffffff 18%);
+}
+
+.skills-page .split-line .meta {
+    font-weight: 700;
+    color: color-mix(in srgb, var(--primary), #ffffff 24%);
+}
+
+.skills-page .progress {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+.skills-page .progress span {
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    box-shadow: 0 0 18px color-mix(in srgb, var(--primary), transparent 70%);
+}
+
+.about-video-card {
+    max-width: 760px;
+    padding: 22px;
+}
+
+.about-video-card .video-shell {
+    aspect-ratio: 16 / 9;
+    max-height: 340px;
+}
+
+@media (max-width: 980px) {
+    .nav-links a {
+        justify-content: flex-start;
+    }
+
+    .nav-links .nav-cta {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-card-footer {
+        align-items: center;
+    }
+}

@@ -220,6 +220,43 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('path_url')) {
+    function path_url(string $path = ''): string
+    {
+        $parsed = parse_url(str_replace('\\', '/', trim($path)) ?: '/');
+        $resolvedPath = '/' . ltrim((string) ($parsed['path'] ?? '/'), '/');
+        $runtimeBasePath = parse_url((string) request_base_url(), PHP_URL_PATH);
+        $configuredBasePath = parse_url(rtrim((string) env('APP_URL', ''), '/'), PHP_URL_PATH);
+
+        $basePath = '';
+        foreach ([$runtimeBasePath, $configuredBasePath] as $candidate) {
+            if (!is_string($candidate) || trim($candidate) === '') {
+                continue;
+            }
+
+            $candidate = rtrim(str_replace('\\', '/', $candidate), '/');
+            if ($candidate === '/public') {
+                $candidate = '';
+            } elseif (str_ends_with($candidate, '/public')) {
+                $candidate = substr($candidate, 0, -strlen('/public')) ?: '';
+            }
+
+            $basePath = $candidate;
+            break;
+        }
+
+        $resolved = ($basePath !== '' ? $basePath : '') . ($resolvedPath === '/' ? '' : $resolvedPath);
+        if (!empty($parsed['query'])) {
+            $resolved .= '?' . $parsed['query'];
+        }
+        if (!empty($parsed['fragment'])) {
+            $resolved .= '#' . $parsed['fragment'];
+        }
+
+        return $resolved !== '' ? $resolved : '/';
+    }
+}
+
 if (!function_exists('should_use_minified_assets')) {
     function should_use_minified_assets(): bool
     {
@@ -260,7 +297,22 @@ if (!function_exists('minified_asset_path')) {
 if (!function_exists('asset')) {
     function asset(string $path): string
     {
-        return url('assets/' . minified_asset_path($path));
+        $resolvedPath = 'assets/' . minified_asset_path($path);
+        $version = null;
+        $publicFile = public_path($resolvedPath);
+        if (is_file($publicFile)) {
+            $timestamp = @filemtime($publicFile);
+            if ($timestamp !== false) {
+                $version = (string) $timestamp;
+            }
+        }
+
+        $assetUrl = path_url($resolvedPath);
+        if ($version === null || $version === '') {
+            return $assetUrl;
+        }
+
+        return $assetUrl . (str_contains($assetUrl, '?') ? '&' : '?') . 'v=' . rawurlencode($version);
     }
 }
 
@@ -368,6 +420,64 @@ if (!function_exists('excerpt')) {
         return mb_substr($text, 0, max(1, $length - 3)) . '...';
     }
 }
+
+if (!function_exists('format_french_date')) {
+    function format_french_date(?string $value, bool $withTime = false): string
+    {
+        $value = trim((string) $value);
+        if ($value === '') {
+            return '';
+        }
+
+        $timestamp = strtotime($value);
+        if ($timestamp === false) {
+            return $value;
+        }
+
+        $months = [
+            1 => 'janvier',
+            2 => 'février',
+            3 => 'mars',
+            4 => 'avril',
+            5 => 'mai',
+            6 => 'juin',
+            7 => 'juillet',
+            8 => 'août',
+            9 => 'septembre',
+            10 => 'octobre',
+            11 => 'novembre',
+            12 => 'décembre',
+        ];
+
+        $formatted = sprintf(
+            '%d %s %s',
+            (int) date('j', $timestamp),
+            $months[(int) date('n', $timestamp)] ?? date('m', $timestamp),
+            date('Y', $timestamp)
+        );
+
+        if ($withTime) {
+            $formatted .= ' à ' . date('H:i', $timestamp);
+        }
+
+        return $formatted;
+    }
+}
+
+if (!function_exists('publication_status_label')) {
+    function publication_status_label(?string $status): string
+    {
+        $status = strtolower(trim((string) $status));
+
+        return match ($status) {
+            'publie' => 'Publié',
+            'brouillon' => 'Brouillon',
+            'archive' => 'Archivé',
+            'planifie' => 'Planifié',
+            default => $status !== '' ? mb_convert_case(str_replace('_', ' ', $status), MB_CASE_TITLE, 'UTF-8') : '',
+        };
+    }
+}
 if (!function_exists('active_class')) {
     function active_class(string $path): string
     {
@@ -415,10 +525,37 @@ if (!function_exists('skill_level_options')) {
     }
 }
 
+if (!function_exists('skill_level_label')) {
+    function skill_level_label(?string $value): string
+    {
+        return match (trim((string) $value)) {
+            'Intermediaire', 'Intermédiaire' => 'Intermédiaire',
+            'Avance', 'Avancé' => 'Avancé',
+            'Notions' => 'Notions',
+            'Expert' => 'Expert',
+            default => trim((string) $value),
+        };
+    }
+}
+
 if (!function_exists('skill_category_options')) {
     function skill_category_options(): array
     {
         return ['Langages', 'Frameworks', 'Securite', 'Outils', 'Autre'];
+    }
+}
+
+if (!function_exists('skill_category_label')) {
+    function skill_category_label(?string $value): string
+    {
+        return match (trim((string) $value)) {
+            'Securite', 'Sécurité' => 'Sécurité',
+            'Langages' => 'Langages',
+            'Frameworks' => 'Frameworks',
+            'Outils' => 'Outils',
+            'Autre' => 'Autre',
+            default => trim((string) $value),
+        };
     }
 }
 
@@ -429,13 +566,27 @@ if (!function_exists('availability_options')) {
     }
 }
 
+if (!function_exists('availability_label')) {
+    function availability_label(?string $value): string
+    {
+        return match (trim((string) $value)) {
+            'disponible' => 'Disponible',
+            'non_disponible' => 'Non disponible',
+            'en_mission' => 'En mission',
+            default => trim(str_replace('_', ' ', (string) $value)),
+        };
+    }
+}
+
 if (!function_exists('skill_level_percent')) {
     function skill_level_percent(mixed $value): int
     {
-        return match ((string) $value) {
+        $value = trim((string) $value);
+
+        return match ($value) {
             'Notions' => 25,
-            'Intermediaire' => 55,
-            'Avance' => 80,
+            'Intermediaire', 'Intermédiaire' => 55,
+            'Avance', 'Avancé' => 80,
             'Expert' => 100,
             default => is_numeric($value) ? max(0, min(100, (int) $value)) : 0,
         };
@@ -716,4 +867,6 @@ if (!function_exists('is_direct_video_url')) {
         return in_array(pathinfo($path, PATHINFO_EXTENSION), ['mp4', 'webm', 'ogg'], true);
     }
 }
+
+
 

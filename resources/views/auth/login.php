@@ -26,16 +26,16 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
             </span>
         </a>
 
-        <div class='kicker'>Back-office prive</div>
+        <div class='kicker'>Back-office priv?</div>
         <h1>Pilote ton portfolio depuis un espace net, premium et rapide.</h1>
-        <p class='lead'>Connecte-toi pour gerer le profil, les projets, les competences, le theme, les reseaux sociaux, les messages et la base de connaissance du chatbot.</p>
+        <p class='lead'>Connecte-toi pour g?rer le profil, les projets, les comp?tences, le th?me, les r?seaux sociaux, les messages et la base de connaissance du chatbot.</p>
 
         <div class='auth-highlight-grid'>
             <article class='auth-highlight-card'>
                 <span class='auth-highlight-icon'><i class='bi bi-person-badge' aria-hidden='true'></i></span>
                 <div>
-                    <strong>Profil centralise</strong>
-                    <p>Nom, bio, photo, CV, video, disponibilite et reseaux au meme endroit.</p>
+                    <strong>Profil centralis?</strong>
+                    <p>Nom, bio, photo, CV, vid?o, disponibilit? et r?seaux au m?me endroit.</p>
                 </div>
             </article>
 
@@ -43,15 +43,15 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
                 <span class='auth-highlight-icon'><i class='bi bi-grid-1x2' aria-hidden='true'></i></span>
                 <div>
                     <strong>Contenu administrable</strong>
-                    <p>Projets, competences, blog, certifications et collaborations sans toucher au code.</p>
+                    <p>Projets, comp?tences, blog, certifications et collaborations sans toucher au code.</p>
                 </div>
             </article>
 
             <article class='auth-highlight-card'>
                 <span class='auth-highlight-icon'><i class='bi bi-palette' aria-hidden='true'></i></span>
                 <div>
-                    <strong>Theme synchronise</strong>
-                    <p>Le dashboard et le site public gardent la meme direction visuelle.</p>
+                    <strong>Th?me synchronis?</strong>
+                    <p>Le dashboard et le site public gardent la m?me direction visuelle.</p>
                 </div>
             </article>
 
@@ -59,7 +59,7 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
                 <span class='auth-highlight-icon'><i class='bi bi-robot' aria-hidden='true'></i></span>
                 <div>
                     <strong>Assistant intelligent</strong>
-                    <p>Le chatbot repond via Groq quand disponible ou via un fallback local structure.</p>
+                    <p>Le chatbot r?pond via Groq quand disponible ou via un fallback local structur?.</p>
                 </div>
             </article>
         </div>
@@ -74,7 +74,7 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
         <div class='auth-card-head'>
             <div class='kicker'>Connexion admin</div>
             <h2>Bienvenue</h2>
-            <p class='lead'>Entre tes identifiants pour acceder au dashboard et administrer le portfolio.</p>
+            <p class='lead'>Entre tes identifiants pour acc?der au dashboard et administrer le portfolio.</p>
         </div>
 
         <form class='form auth-form' method='post' action='<?= url('/admin/login') ?>'>
@@ -94,7 +94,7 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
                     <input type='checkbox' name='remember' value='1'>
                     <span>Se souvenir de moi</span>
                 </label>
-                <span class='auth-check-note'>Acces reserve a l administration</span>
+                <span class='auth-check-note'>Acc?s r?serv? ? l'administration</span>
             </div>
 
             <button class='btn auth-submit' type='submit'>Entrer dans le dashboard</button>
@@ -102,7 +102,7 @@ $useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
 
         <div class='auth-helper'>
             <span class='auth-helper-icon'><i class='bi bi-shield-lock' aria-hidden='true'></i></span>
-            <p>Cette page sert uniquement a administrer le portfolio : contenu, theme, analytics, messages et configuration du chatbot.</p>
+            <p>Cette page sert uniquement ? administrer le portfolio : contenu, th?me, analytics, messages et configuration du chatbot.</p>
         </div>
     </div>
 </section>

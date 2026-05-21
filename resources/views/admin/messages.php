@@ -3,8 +3,8 @@
 <section
     class='messages-live-shell'
     data-live-messages
-    data-live-endpoint='<?= e(url('/api/v1/messages?limit=50')) ?>'
-    data-admin-base='<?= e(url('/admin/messages')) ?>'
+    data-live-endpoint='<?= e(path_url('/api/v1/messages?limit=50')) ?>'
+    data-admin-base='<?= e(path_url('/admin/messages')) ?>'
     data-csrf='<?= e(csrf_token()) ?>'
     data-live-interval='30000'
 >
@@ -12,20 +12,20 @@
         <div class='messages-live-head'>
             <div>
                 <div class='kicker'>Archive + live</div>
-                <h2>Messagerie synchronisee</h2>
-                <p class='meta' data-live-summary><?= $messageCount > 0 ? e($messageCount . ' message(s) archives charges. Le flux live Firestore va se synchroniser automatiquement.') : 'Aucun message archive pour le moment. Le flux live Firestore prendra le relais des qu un nouveau message arrivera.' ?></p>
+                <h2>Messagerie synchronisée</h2>
+                <p class='meta' data-live-summary><?= $messageCount > 0 ? e($messageCount . ' message(s) archivés chargés. Le flux live Firestore va se synchroniser automatiquement.') : 'Aucun message archivé pour le moment. Le flux live Firestore prendra le relais dès qu un nouveau message arrivera.' ?></p>
             </div>
             <div class='actions messages-live-actions'>
-                <span class='badge blue' data-live-status>Archive chargee</span>
+                <span class='badge blue' data-live-status>Archive chargée</span>
                 <span class='badge' data-live-last-sync>Connexion live en attente</span>
-                <button class='btn ghost' type='button' data-live-refresh>Rafraichir</button>
+                <button class='btn ghost' type='button' data-live-refresh>Rafraîchir</button>
             </div>
         </div>
     </div>
 
     <div class='table-wrap messages-table-wrap'>
         <table class='messages-table'>
-            <thead><tr><th>Expediteur</th><th>Sujet</th><th>Date</th><th>Etat</th><th>Flux</th><th>Actions</th></tr></thead>
+            <thead><tr><th>Expéditeur</th><th>Sujet</th><th>Date</th><th>État</th><th>Flux</th><th>Actions</th></tr></thead>
             <tbody data-live-messages-body>
                 <?php if (!empty($messages)): ?>
                     <?php foreach ($messages as $message): ?>
@@ -39,7 +39,7 @@
                             <td>
                                 <div class='actions'>
                                     <a class='btn ghost' href='<?= url('/admin/messages/' . $message['id']) ?>'>Lire</a>
-                                    <a class='btn ghost' href='mailto:<?= e($message['email']) ?>?subject=<?= rawurlencode('Re: ' . ($message['sujet'] ?? '')) ?>'>Repondre</a>
+                                    <a class='btn ghost' href='mailto:<?= e($message['email']) ?>?subject=<?= rawurlencode('Re: ' . ($message['sujet'] ?? '')) ?>'>Répondre</a>
                                     <?php if ($isUnread): ?>
                                         <form method='post' action='<?= url('/admin/messages/' . $message['id'] . '/read') ?>'>
                                             <?= csrf_field() ?>

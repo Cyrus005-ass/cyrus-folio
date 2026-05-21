@@ -14,13 +14,13 @@ if (!empty($profile['email'])) {
 }
 if (!empty($profile['phone'])) {
     $phoneHref = preg_replace('/\s+/', '', (string) $profile['phone']) ?: '';
-    $detailItems[] = ['label' => 'Telephone', 'value' => (string) $profile['phone'], 'href' => $phoneHref !== '' ? 'tel:' . $phoneHref : null];
+    $detailItems[] = ['label' => 'Téléphone', 'value' => (string) $profile['phone'], 'href' => $phoneHref !== '' ? 'tel:' . $phoneHref : null];
 }
 if (!empty($profile['location'])) {
     $detailItems[] = ['label' => 'Localisation', 'value' => (string) $profile['location'], 'href' => null];
 }
 if (!empty($profile['availability'])) {
-    $detailItems[] = ['label' => 'Disponibilite', 'value' => str_replace('_', ' ', (string) $profile['availability']), 'href' => null];
+    $detailItems[] = ['label' => 'Disponibilité', 'value' => str_replace('_', ' ', (string) $profile['availability']), 'href' => null];
 }
 if ($websiteUrl !== '') {
     $detailItems[] = ['label' => 'Site web', 'value' => $websiteUrl, 'href' => $websiteUrl];
@@ -42,7 +42,7 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
 }
 ?>
 
-<section class='section page-shell'>
+<section class='section page-shell about-page'>
     <div class='container intro-grid'>
         <aside class='profile-panel about-profile-card'>
             <div class='profile-header'>
@@ -55,7 +55,7 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
                     <div class='status-indicator'></div>
                 </div>
                 <h3><?= e($displayName) ?></h3>
-                <span class='role'><?= e($profile['title'] ?? 'Developpeur fullstack') ?></span>
+                <span class='role'><?= e($profile['title'] ?? 'Développeur fullstack') ?></span>
             </div>
 
             <?php if ($aboutStats !== []): ?>
@@ -86,9 +86,9 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
 
         <div class='content-panel content-wrapper'>
             <div class='bio-section'>
-                <div class='section-tag'>A propos</div>
-                <h2>Une vue d'ensemble du profil, du parcours et de la facon de travailler.</h2>
-                <p class='lead'><?= e($profile['bio'] ?? 'Ce portfolio presente un profil, des projets et un espace administrable.') ?></p>
+                <div class='section-tag'>À propos</div>
+                <h2>Une vue d'ensemble du profil, du parcours et de la façon de travailler.</h2>
+                <p class='lead'><?= e($profile['bio'] ?? 'Ce portfolio présente un profil, des projets et un espace administrable.') ?></p>
             </div>
 
             <?php if ($detailItems !== []): ?>
@@ -112,8 +112,8 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
 
             <?php if ($skills !== []): ?>
                 <div class='skills-showcase'>
-                    <div class='section-tag'>Competences</div>
-                    <h3>Maitrise technique</h3>
+                    <div class='section-tag'>Compétences</div>
+                    <h3>Maîtrise technique</h3>
                     <div class='skills-list'>
                         <?php foreach ($skills as $skill): ?>
                             <?php $skillPercent = skill_level_percent($skill['niveau'] ?? 0); ?>
@@ -132,7 +132,7 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
 
             <?php if ($networkLinks !== []): ?>
                 <div class='network-section'>
-                    <div class='section-tag'>Reseaux</div>
+                    <div class='section-tag'>Réseaux</div>
                     <h3>Retrouve-moi aussi ici</h3>
                     <div class='network-grid'>
                         <?php foreach ($networkLinks as $link): ?>
@@ -152,24 +152,25 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
 <?php if ($video = presentation_video_data($profile['presentation_video_url'] ?? null)): ?>
 <section class='section'>
     <div class='container'>
-        <div class='card video-feature'>
+        <div class='card video-feature about-video-card'>
             <div class='section-head compact-head'>
                 <div>
-                    <div class='kicker'>Presentation</div>
-                    <h2>Video de presentation</h2>
+                    <div class='kicker'>Présentation</div>
+                    <h2>Vidéo de présentation</h2>
                 </div>
             </div>
             <div class='video-shell'>
                 <?php if ($video['type'] === 'embed'): ?>
-                    <iframe src='<?= e($video['src']) ?>' title='Video de presentation' loading='lazy' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen referrerpolicy='strict-origin-when-cross-origin'></iframe>
+                    <iframe src='<?= e($video['src']) ?>' title='Vidéo de présentation' loading='lazy' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share' allowfullscreen referrerpolicy='strict-origin-when-cross-origin'></iframe>
                 <?php else: ?>
                     <video controls preload='metadata' src='<?= e($video['src']) ?>'></video>
                 <?php endif; ?>
             </div>
             <div class='button-row'>
-                <a class='btn ghost' href='<?= e($video['url']) ?>' target='_blank' rel='noreferrer'>Ouvrir la video</a>
+                <a class='btn ghost' href='<?= e($video['url']) ?>' target='_blank' rel='noreferrer'>Ouvrir la vidéo</a>
             </div>
         </div>
     </div>
 </section>
 <?php endif; ?>
+

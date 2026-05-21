@@ -8,11 +8,11 @@
             <p class='lead'>Utilise ce formulaire pour une mission, une collaboration ou une prise de contact simple.</p>
             <div class='stack-list'>
                 <?php if (!empty($profile['email'])): ?><p><strong>Email :</strong> <?= e($profile['email']) ?></p><?php endif; ?>
-                <?php if (!empty($profile['phone'])): ?><p><strong>Telephone :</strong> <?= e($profile['phone']) ?></p><?php endif; ?>
+                <?php if (!empty($profile['phone'])): ?><p><strong>Téléphone :</strong> <?= e($profile['phone']) ?></p><?php endif; ?>
                 <?php if (!empty($profile['location'])): ?><p><strong>Localisation :</strong> <?= e($profile['location']) ?></p><?php endif; ?>
                 <?php if ($socialLinks !== []): ?>
                     <div>
-                        <strong>Reseaux :</strong>
+                        <strong>Réseaux :</strong>
                         <div class='button-row'>
                             <?php foreach ($socialLinks as $link): ?>
                                 <a class='btn ghost' href='<?= e($link['url']) ?>' target='_blank' rel='noreferrer'><?= e($link['label']) ?></a>

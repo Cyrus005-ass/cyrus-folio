@@ -57,8 +57,8 @@ class CertificationController extends Controller
         }
 
         $this->model->create($data);
-        ActivityService::log('certification.create', 'Creation certification ' . $data['titre']);
-        flash('success', 'Certification creee.');
+        ActivityService::log('certification.create', 'Cr?ation certification ' . $data['titre']);
+        flash('success', 'Certification cr??e.');
         redirect('/admin/certifications');
     }
 
@@ -79,8 +79,8 @@ class CertificationController extends Controller
         }
 
         $this->model->update($id, $data);
-        ActivityService::log('certification.update', 'Mise a jour certification #' . $id);
-        flash('success', 'Certification mise a jour.');
+        ActivityService::log('certification.update', 'Mise ? jour certification #' . $id);
+        flash('success', 'Certification mise ? jour.');
         redirect('/admin/certifications');
     }
 
@@ -94,7 +94,7 @@ class CertificationController extends Controller
         }
 
         $this->model->delete($id);
-        flash('success', 'Certification supprimee.');
+        flash('success', 'Certification supprim?e.');
         redirect('/admin/certifications');
     }
 
@@ -191,14 +191,14 @@ class CertificationController extends Controller
         $errors = validate_required($data, ['titre', 'organisme', 'date_obtention']);
 
         if (!is_valid_date_or_empty($data['date_obtention'] ?? null)) {
-            $errors['date_obtention'] = 'Date d obtention invalide.';
+            $errors['date_obtention'] = 'Date d\'obtention invalide.';
         }
         if (!is_valid_date_or_empty($data['date_expiration'] ?? null)) {
-            $errors['date_expiration'] = 'Date d expiration invalide.';
+            $errors['date_expiration'] = 'Date d\'expiration invalide.';
         }
 
         if (!empty($data['date_obtention']) && !empty($data['date_expiration']) && $data['date_expiration'] < $data['date_obtention']) {
-            $errors['date_expiration'] = 'La date d expiration doit etre posterieure a la date d obtention.';
+            $errors['date_expiration'] = 'La date d\'expiration doit ?tre post?rieure ? la date d\'obtention.';
         }
 
         foreach (['badge_url', 'lien_verification'] as $field) {
