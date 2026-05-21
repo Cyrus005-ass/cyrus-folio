@@ -4,7 +4,13 @@ RewriteEngine On
 RewriteRule (^|/)\. - [F,L]
 RewriteRule ^(app|config|database|resources|storage|vendor)/ - [F,L]
 
-# Compatibilite hebergements partages: on sert tout depuis public/ sans regles avancees.
-RewriteCond %{REQUEST_URI} !^/public/
-RewriteRule ^(.*)$ public/$1 [L]
+# Sert les fichiers statiques du dossier public sans exposer les autres repertoires.
+RewriteRule ^(assets/.+)$ public/$1 [L,NC]
+RewriteRule ^(favicon\.ico|robots\.txt)$ public/$1 [L,NC]
+
+# Route toutes les URL applicatives vers le front-controller racine.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^$ index.php [L]
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
 
