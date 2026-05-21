@@ -8,8 +8,37 @@ $iconHref = static function (?string $path): string {
         return '';
     }
 
-    return absolute_url($path) ?? '';
+    $url = absolute_url($path) ?? '';
+    if ($url === '') {
+        return '';
+    }
+
+    if (preg_match('/^https?:\/\//i', $path) === 1) {
+        return $url;
+    }
+
+    $normalized = ltrim(str_replace('\\', '/', $path), '/');
+    $candidates = [
+        public_path($normalized),
+        public_path('assets/' . $normalized),
+    ];
+
+    foreach ($candidates as $candidate) {
+        if (!is_file($candidate)) {
+            continue;
+        }
+
+        $timestamp = @filemtime($candidate);
+        if ($timestamp === false) {
+            continue;
+        }
+
+        return $url . (str_contains($url, '?') ? '&' : '?') . 'v=' . rawurlencode((string) $timestamp);
+    }
+
+    return $url;
 };
+
 
 $faviconIco = $iconHref($iconConfig['favicon_ico'] ?? 'favicon.ico');
 $faviconSvg = $iconHref($iconConfig['favicon_svg'] ?? 'assets/icons/favicon.svg');
