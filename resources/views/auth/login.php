@@ -5,14 +5,15 @@ if (!function_exists('url') || !function_exists('csrf_field')) {
 
 $siteName = trim((string) env('APP_NAME', 'Cyrus-y ASSOGBA'));
 $logoVideoUrl = is_file(public_path('assets/uploads/C-y.mp4')) ? asset('uploads/C-y.mp4') : '';
+$useLogoVideo = $logoVideoUrl !== '' && !save_data_enabled();
 ?>
 
 <section class='auth-login-shell'>
     <div class='auth-login-showcase'>
         <a class='auth-brand' href='<?= url('/') ?>'>
-            <?php if ($logoVideoUrl !== ''): ?>
+            <?php if ($useLogoVideo): ?>
                 <span class='brand-emblem' aria-hidden='true'>
-                    <video class='brand-logo-video' autoplay muted loop playsinline preload='auto'>
+                    <video class='brand-logo-video' autoplay muted loop playsinline preload='metadata'>
                         <source src='<?= e($logoVideoUrl) ?>' type='video/mp4'>
                     </video>
                 </span>

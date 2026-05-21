@@ -3,6 +3,7 @@
 <?php $profileTitle = trim((string) ($profile['title'] ?? '')); ?>
 <?php $profileBio = excerpt((string) (($profile['bio'] ?? '') ?: 'Portfolio personnel et professionnel.'), 180); ?>
 <?php $phoneHref = preg_replace('/\s+/', '', (string) ($profile['phone'] ?? '')) ?: ''; ?>
+<?php $websiteUrl = absolute_url($profile['website_url'] ?? null) ?? ''; ?>
 
 <footer class='footer'>
   <div class='container footer-grid'>
@@ -39,7 +40,7 @@
         <?php if (!empty($profile['email'])): ?><a href='mailto:<?= e($profile['email']) ?>'><?= e($profile['email']) ?></a><?php endif; ?>
         <?php if ($phoneHref !== ''): ?><a href='tel:<?= e($phoneHref) ?>'><?= e($profile['phone']) ?></a><?php endif; ?>
         <?php if (!empty($profile['location'])): ?><span><?= e($profile['location']) ?></span><?php endif; ?>
-        <?php if (!empty($profile['website_url'])): ?><a href='<?= e($profile['website_url']) ?>' target='_blank' rel='noreferrer'>Site web</a><?php endif; ?>
+        <?php if ($websiteUrl !== ''): ?><a href='<?= e($websiteUrl) ?>' target='_blank' rel='noreferrer'>Site web</a><?php endif; ?>
         <a href='<?= url('/contact') ?>'>Discuter d'un projet</a>
       </div>
     </div>

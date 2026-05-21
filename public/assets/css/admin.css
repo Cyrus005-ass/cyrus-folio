@@ -219,6 +219,51 @@ th {
     background: color-mix(in srgb, var(--secondary), #ffffff 3%);
 }
 
+.messages-live-panel {
+    margin-bottom: 16px;
+}
+
+.messages-live-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+}
+
+.messages-live-head h2 {
+    margin: 8px 0 10px;
+}
+
+.messages-live-actions {
+    justify-content: flex-end;
+}
+
+.messages-live-panel .badge {
+    white-space: nowrap;
+}
+
+.messages-table td .meta {
+    margin-top: 4px;
+}
+
+.messages-table tbody tr.is-unread {
+    background: color-mix(in srgb, var(--primary), transparent 93%);
+}
+
+.messages-table tbody tr.is-new-live {
+    animation: liveMessagePulse 2.8s ease;
+}
+
+@keyframes liveMessagePulse {
+    0% {
+        box-shadow: inset 0 0 0 999px color-mix(in srgb, var(--accent), transparent 86%);
+    }
+
+    100% {
+        box-shadow: inset 0 0 0 999px transparent;
+    }
+}
+
 @media (max-width: 1000px) {
     .admin-shell,
     .stats,
@@ -238,6 +283,14 @@ th {
     .topbar {
         flex-direction: column;
         align-items: flex-start;
+    }
+
+    .messages-live-head {
+        flex-direction: column;
+    }
+
+    .messages-live-actions {
+        justify-content: flex-start;
     }
 }
 

@@ -3,17 +3,21 @@ $brandName = trim((string) (($profile['full_name'] ?? '') ?: env('APP_NAME', 'Cy
 $brandParts = preg_split('/\s+/', $brandName) ?: [$brandName];
 $brandShort = 'C-Y';
 $logoVideoUrl = is_file(public_path('assets/uploads/C-y.mp4')) ? asset('uploads/C-y.mp4') : '';
+$brandVideoEnabled = (bool) env('APP_BRAND_VIDEO', false);
+$useLogoVideo = $brandVideoEnabled && $logoVideoUrl !== '' && !save_data_enabled();
 ?>
 
 <header class='navbar'>
     <div class='container nav-inner'>
         <a class='brand brand-text' href='<?= url('/') ?>'>
-            <?php if ($logoVideoUrl !== ''): ?>
+            <?php if ($useLogoVideo): ?>
                 <span class='brand-emblem' aria-hidden='true'>
-                    <video class='brand-logo-video' autoplay muted loop playsinline preload='auto'>
+                    <video class='brand-logo-video' autoplay muted loop playsinline preload='metadata'>
                         <source src='<?= e($logoVideoUrl) ?>' type='video/mp4'>
                     </video>
                 </span>
+            <?php else: ?>
+                <span class='brand-mark' aria-hidden='true'>C-Y</span>
             <?php endif; ?>
             <span class='sitename'><?= e($brandShort !== '' ? $brandShort : $brandName) ?></span>
         </a>

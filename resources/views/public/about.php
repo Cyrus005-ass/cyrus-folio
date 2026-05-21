@@ -4,6 +4,7 @@
 <?php $displayName = trim((string) (($profile['full_name'] ?? '') ?: 'Cyrus-y ASSOGBA')); ?>
 <?php $initials = strtoupper(substr(preg_replace('/[^A-Za-z]/', '', $displayName) ?: 'CA', 0, 2)); ?>
 <?php $cvUrl = absolute_url($profile['cv_url'] ?? null) ?? ''; ?>
+<?php $websiteUrl = absolute_url($profile['website_url'] ?? null) ?? ''; ?>
 <?php $skills = is_array($skills ?? null) ? $skills : []; ?>
 <?php $aboutStats = is_array($aboutStats ?? null) ? $aboutStats : []; ?>
 <?php
@@ -21,8 +22,8 @@ if (!empty($profile['location'])) {
 if (!empty($profile['availability'])) {
     $detailItems[] = ['label' => 'Disponibilite', 'value' => str_replace('_', ' ', (string) $profile['availability']), 'href' => null];
 }
-if (!empty($profile['website_url'])) {
-    $detailItems[] = ['label' => 'Site web', 'value' => (string) $profile['website_url'], 'href' => (string) $profile['website_url']];
+if ($websiteUrl !== '') {
+    $detailItems[] = ['label' => 'Site web', 'value' => $websiteUrl, 'href' => $websiteUrl];
 }
 
 $networkLinks = [];
@@ -47,7 +48,7 @@ foreach (array_merge($socialLinks, $otherLinks) as $link) {
             <div class='profile-header'>
                 <div class='profile-avatar'>
                     <?php if ($profileImage !== ''): ?>
-                        <img src='<?= e($profileImage) ?>' alt='<?= e($displayName) ?>'>
+                        <img src='<?= e($profileImage) ?>' alt='<?= e($displayName) ?>' loading='eager' decoding='async' fetchpriority='high'>
                     <?php else: ?>
                         <div class='profile-avatar-fallback profile-avatar-fallback-circle'><?= e($initials) ?></div>
                     <?php endif; ?>

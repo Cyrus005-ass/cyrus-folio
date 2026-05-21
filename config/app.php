@@ -6,7 +6,7 @@ $environment = (string) Env::get('APP_ENV', 'local');
 
 return [
     'name' => Env::get('APP_NAME', 'Cyrus-y ASSOGBA'),
-    'url' => Env::get('APP_URL', 'http://localhost/portfolio-os'),
+    'url' => Env::get('APP_URL', 'https://cyrus-youp.unaux.com'),
     'env' => $environment,
     'debug' => Env::get('APP_DEBUG', false),
     'locale' => Env::get('APP_LOCALE', 'fr_FR'),

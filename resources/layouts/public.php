@@ -26,9 +26,11 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <title><?= e($fullTitle) ?></title>
     <meta name='description' content='<?= e($metaDescription) ?>'>
+    <?php if ($fontStylesheetUrl = ThemeService::fontStylesheetUrl($activeTheme)): ?>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-    <link href='https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&family=Raleway:wght@500;600;700;800;900&family=Roboto:wght@400;500;700&display=swap' rel='stylesheet'>
+    <link href='<?= e($fontStylesheetUrl) ?>' rel='stylesheet'>
+    <?php endif; ?>
     <link rel='stylesheet' href='<?= asset('vendor/bootstrap-icons/bootstrap-icons.css') ?>'>
     <?php if ($metaKeywords !== ''): ?><meta name='keywords' content='<?= e($metaKeywords) ?>'><?php endif; ?>
     <meta name='author' content='<?= e($metaAuthor) ?>'>
@@ -55,7 +57,6 @@ $twitterCard = $metaImage !== '' ? 'summary_large_image' : 'summary';
     <link rel='stylesheet' href='<?= asset('css/main.css') ?>'>
     <link rel='stylesheet' href='<?= asset('css/theme.css') ?>'>
     <?php if (ThemeService::animationsEnabled()): ?><link rel='stylesheet' href='<?= asset('css/animations.css') ?>'><?php endif; ?>
-    <script>window.APP_URL = <?= json_encode(app_url()) ?>;</script>
 </head>
 <body class='<?= e(current_uri() === '/' ? 'home-page' : 'inner-page') ?>'>
 <?php require RESOURCE_PATH . '/components/navbar.php'; ?>

@@ -64,7 +64,7 @@ if ($serviceCards === []) {
 ?>
 
 <section class='hero'>
-    <?php if ($profileImage !== ''): ?><img class='hero-bg-media' src='<?= e($profileImage) ?>' alt='<?= e($displayName) ?>'><?php endif; ?>
+    <?php if ($profileImage !== ''): ?><img class='hero-bg-media' src='<?= e($profileImage) ?>' alt='<?= e($displayName) ?>' loading='eager' decoding='async' fetchpriority='high'><?php endif; ?>
     <div class='hero-backdrop'></div>
     <div class='container hero-stack'>
         <h1>Salut, je suis <?= e($displayName) ?></h1>
@@ -214,7 +214,7 @@ if ($serviceCards === []) {
                 <article class='portfolio-card' data-reveal style='--reveal-delay: <?= e((string) (($index + 1) * 110)) ?>ms;'>
                     <div class='portfolio-media'>
                         <?php if ($projectImage !== ''): ?>
-                            <img src='<?= e($projectImage) ?>' alt='<?= e($project['titre']) ?>'>
+                            <img src='<?= e($projectImage) ?>' alt='<?= e($project['titre']) ?>' loading='lazy' decoding='async' fetchpriority='low'>
                         <?php else: ?>
                             <div class='project-cover'><?= e($project['titre']) ?></div>
                         <?php endif; ?>
@@ -239,8 +239,8 @@ if ($serviceCards === []) {
 
                         <div class='button-row'>
                             <a class='btn ghost' href='<?= url('/projects/' . ($project['slug'] ?? '')) ?>'>Details</a>
-                            <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e($project['github_url']) ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                            <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e($project['demo_url']) ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
+                            <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($project['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
+                            <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
                         </div>
                     </div>
                 </article>

@@ -302,10 +302,18 @@ if (!function_exists('sanitize_rich_text_attr')) {
             if (preg_match('/^[a-z][a-z0-9+.-]*:/i', $decoded) === 1) {
                 $scheme = strtolower((string) parse_url($decoded, PHP_URL_SCHEME));
                 $allowedSchemes = $tag === 'a' ? ['http', 'https', 'mailto', 'tel'] : ['http', 'https'];
-                return in_array($scheme, $allowedSchemes, true) ? $decoded : null;
+                if (!in_array($scheme, $allowedSchemes, true)) {
+                    return null;
+                }
+
+                if (in_array($scheme, ['http', 'https'], true)) {
+                    return absolute_url($decoded) ?? $decoded;
+                }
+
+                return $decoded;
             }
 
-            return $decoded;
+            return $tag === 'img' ? (absolute_url($decoded) ?? $decoded) : $decoded;
         }
 
         if ($attribute === 'target') {

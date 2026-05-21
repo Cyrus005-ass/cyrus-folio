@@ -253,7 +253,10 @@ class ChatbotService
                 $lines[] = '- Availability: ' . str_replace('_', ' ', (string) $profile['availability']);
             }
             if (!empty($profile['website_url'])) {
-                $lines[] = '- Website: ' . $profile['website_url'];
+                $websiteUrl = absolute_url((string) $profile['website_url']);
+                if ($websiteUrl !== null) {
+                    $lines[] = '- Website: ' . $websiteUrl;
+                }
             }
             if (!empty($profile['cv_url'])) {
                 $cvUrl = absolute_url((string) $profile['cv_url']);
@@ -285,7 +288,7 @@ class ChatbotService
                     (string) ($project['titre'] ?? ''),
                     $this->limitText((string) ($project['description'] ?? ''), 180),
                     !empty($project['technologies']) ? 'Tech: ' . $this->limitText((string) $project['technologies'], 120) : '',
-                    !empty($project['demo_url']) ? 'Demo: ' . $project['demo_url'] : '',
+                    !empty($project['demo_url']) ? 'Demo: ' . (absolute_url((string) $project['demo_url']) ?? (string) $project['demo_url']) : '',
                 ])));
             }
         }
@@ -637,7 +640,10 @@ class ChatbotService
             $parts[] = 'telephone : ' . $profile['phone'];
         }
         if (!empty($profile['website_url'])) {
-            $parts[] = 'site : ' . $profile['website_url'];
+            $websiteUrl = absolute_url((string) $profile['website_url']);
+            if ($websiteUrl !== null) {
+                $parts[] = 'site : ' . $websiteUrl;
+            }
         }
 
         $socialLinks = profile_social_links($profile);

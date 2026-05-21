@@ -116,6 +116,12 @@ $router->delete('/api/v1/posts/{id}', [PostController::class, 'destroyApi']);
 $router->post('/api/v1/contacts', [ContactController::class, 'storeApi']);
 $router->get('/api/v1/contacts', [ContactController::class, 'indexApi']);
 
+$router->post('/api/v1/messages', [ContactController::class, 'storeApi']);
+$router->get('/api/v1/messages', [ContactController::class, 'liveIndexApi']);
+$router->get('/api/v1/messages/{id}', [ContactController::class, 'liveShowApi']);
+$router->put('/api/v1/messages/{id}/read', [ContactController::class, 'markReadApi']);
+$router->delete('/api/v1/messages/{id}', [ContactController::class, 'destroyApi']);
+
 $router->get('/api/v1/notifications', [NotificationController::class, 'indexApi']);
 $router->put('/api/v1/notifications/{id}/read', [NotificationController::class, 'read']);
 

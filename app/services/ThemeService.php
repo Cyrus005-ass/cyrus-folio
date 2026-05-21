@@ -63,9 +63,82 @@ class ThemeService
         '}';
     }
 
+    public static function fontStylesheetUrl(?array $theme = null): ?string
+    {
+        if (save_data_enabled() || !(bool) env('APP_EXTERNAL_FONTS', true)) {
+            return null;
+        }
+
+        $theme ??= self::activeTheme();
+        $families = self::googleFontFamilies($theme);
+        if ($families === []) {
+            return null;
+        }
+
+        $parts = [];
+        foreach ($families as $family => $weights) {
+            $part = 'family=' . str_replace('%20', '+', rawurlencode($family));
+            if ($weights !== []) {
+                $part .= ':wght@' . implode(';', $weights);
+            }
+            $parts[] = $part;
+        }
+
+        $parts[] = 'display=swap';
+
+        return 'https://fonts.googleapis.com/css2?' . implode('&', $parts);
+    }
+
     public static function animationsEnabled(): bool
     {
         return !empty(self::activeTheme()['animations_enabled']);
+    }
+
+    private static function googleFontFamilies(array $theme): array
+    {
+        $catalog = self::googleFontCatalog();
+        $families = [];
+
+        $candidates = [
+            self::normalizeFontFamilyName((string) ($theme['display_font_family'] ?? $theme['font_family'] ?? '')),
+            self::normalizeFontFamilyName((string) ($theme['body_font_family'] ?? $theme['font_family'] ?? '')),
+        ];
+
+        foreach ($candidates as $candidate) {
+            if ($candidate === null) {
+                continue;
+            }
+
+            foreach ($catalog as $family => $weights) {
+                if (strcasecmp($family, $candidate) === 0) {
+                    $families[$family] = $weights;
+                    break;
+                }
+            }
+        }
+
+        return $families;
+    }
+
+    private static function googleFontCatalog(): array
+    {
+        return [
+            'Mulish' => ['400', '500', '600', '700', '800'],
+            'Roboto' => ['400', '500', '700'],
+            'Poppins' => ['400', '500', '600', '700', '800'],
+            'Source Sans 3' => ['400', '600', '700'],
+            'Raleway' => ['500', '600', '700', '800'],
+        ];
+    }
+
+    private static function normalizeFontFamilyName(string $value): ?string
+    {
+        $first = trim((string) explode(',', $value, 2)[0], " \t\n\r\0\x0B'\"");
+        if ($first === '') {
+            return null;
+        }
+
+        return preg_replace('/\s+/', ' ', $first) ?: $first;
     }
 
     private static function isLegacyDefaultTheme(array $theme): bool

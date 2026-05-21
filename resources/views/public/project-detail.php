@@ -7,8 +7,8 @@
 
             <div class='button-row'>
                 <a class='btn ghost' href='<?= url('/projects') ?>'>Retour</a>
-                <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e($project['github_url']) ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e($project['demo_url']) ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
+                <?php if (!empty($project['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($project['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
+                <?php if (!empty($project['demo_url'])): ?><a class='btn' href='<?= e(absolute_url($project['demo_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir la demo</a><?php endif; ?>
             </div>
         </div>
 
@@ -23,11 +23,11 @@
             <?php endif; ?>
 
             <?php $galleryImages = decode_json_array($project['gallery_images'] ?? null); ?>
-            <?php if (!empty($project['image_url'])): ?><img src='<?= e(url('/' . ltrim((string) $project['image_url'], '/'))) ?>' alt='<?= e($project['titre'] ?? 'Projet') ?>' style='max-height:360px;width:100%;object-fit:cover;border-radius:20px;'><?php endif; ?>
+            <?php if (!empty($project['image_url'])): ?><img src='<?= e(absolute_url($project['image_url'] ?? null) ?? '') ?>' alt='<?= e($project['titre'] ?? 'Projet') ?>' loading='eager' decoding='async' fetchpriority='high' style='max-height:360px;width:100%;object-fit:cover;border-radius:20px;'><?php endif; ?>
             <?php if (!empty($galleryImages)): ?>
                 <div class='grid grid-3'>
                     <?php foreach ($galleryImages as $image): ?>
-                        <img src='<?= e(url('/' . ltrim($image, '/'))) ?>' alt='Image du projet' style='height:180px;width:100%;object-fit:cover;border-radius:18px;'>
+                        <img src='<?= e(absolute_url($image) ?? '') ?>' alt='Image du projet' loading='lazy' decoding='async' fetchpriority='low' style='height:180px;width:100%;object-fit:cover;border-radius:18px;'>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -51,9 +51,9 @@
                             <?php if (!empty($collaboration['email']) || !empty($collaboration['portfolio_url']) || !empty($collaboration['github_url']) || !empty($collaboration['linkedin_url'])): ?>
                                 <div class='button-row'>
                                     <?php if (!empty($collaboration['email'])): ?><a class='btn ghost' href='mailto:<?= e($collaboration['email']) ?>'>Email</a><?php endif; ?>
-                                    <?php if (!empty($collaboration['portfolio_url'])): ?><a class='btn ghost' href='<?= e($collaboration['portfolio_url']) ?>' target='_blank' rel='noreferrer'>Portfolio</a><?php endif; ?>
-                                    <?php if (!empty($collaboration['github_url'])): ?><a class='btn ghost' href='<?= e($collaboration['github_url']) ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
-                                    <?php if (!empty($collaboration['linkedin_url'])): ?><a class='btn ghost' href='<?= e($collaboration['linkedin_url']) ?>' target='_blank' rel='noreferrer'>LinkedIn</a><?php endif; ?>
+                                    <?php if (!empty($collaboration['portfolio_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($collaboration['portfolio_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Portfolio</a><?php endif; ?>
+                                    <?php if (!empty($collaboration['github_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($collaboration['github_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>GitHub</a><?php endif; ?>
+                                    <?php if (!empty($collaboration['linkedin_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($collaboration['linkedin_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>LinkedIn</a><?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </article>

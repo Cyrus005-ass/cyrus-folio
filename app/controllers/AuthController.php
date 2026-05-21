@@ -26,8 +26,10 @@ class AuthController extends Controller
         $email = trim((string) ($data['email'] ?? ''));
         $password = (string) ($data['password'] ?? '');
         $remember = !empty($data['remember']);
+        $firebaseIdToken = is_api_request() ? $this->firebaseIdToken($data) : '';
+        $rateLimitIdentity = $email !== '' ? $email : ($firebaseIdToken !== '' ? 'firebase-token' : '');
 
-        $retryAfter = $this->loginRetryAfter($email);
+        $retryAfter = $this->loginRetryAfter($rateLimitIdentity);
         if ($retryAfter > 0) {
             $message = 'Trop de tentatives de connexion. Reessaie dans ' . max(1, (int) ceil($retryAfter / 60)) . ' minute(s).';
             if (is_api_request()) {
@@ -39,12 +41,22 @@ class AuthController extends Controller
         }
 
         if (is_api_request()) {
-            if (AuthService::login($email, $password, $remember)) {
-                $this->clearLoginRateLimit($email);
-                $this->json(['success' => true, 'user' => auth_user()]);
+            if ($firebaseIdToken !== '') {
+                if (AuthService::loginWithFirebaseIdToken($firebaseIdToken, $remember)) {
+                    $this->clearLoginRateLimit($rateLimitIdentity);
+                    $this->json(['success' => true, 'user' => auth_user(), 'auth_driver' => 'firebase']);
+                }
+
+                $this->hitLoginRateLimit($rateLimitIdentity);
+                $this->json(['success' => false, 'message' => 'Jeton Firebase invalide ou utilisateur local non autorise'], 401);
             }
 
-            $this->hitLoginRateLimit($email);
+            if (AuthService::login($email, $password, $remember)) {
+                $this->clearLoginRateLimit($rateLimitIdentity);
+                $this->json(['success' => true, 'user' => auth_user(), 'auth_driver' => 'local']);
+            }
+
+            $this->hitLoginRateLimit($rateLimitIdentity);
             $this->json(['success' => false, 'message' => 'Identifiants invalides'], 422);
         }
 
@@ -111,5 +123,17 @@ class AuthController extends Controller
             'auth:login:ip:' . $ip,
             'auth:login:identity:' . sha1($ip . '|' . $identity),
         ];
+    }
+
+    private function firebaseIdToken(array $data): string
+    {
+        foreach (['firebase_id_token', 'firebaseIdToken', 'idToken'] as $key) {
+            $value = trim((string) ($data[$key] ?? ''));
+            if ($value !== '') {
+                return $value;
+            }
+        }
+
+        return trim((string) (request_bearer_token() ?? ''));
     }
 }

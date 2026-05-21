@@ -50,10 +50,164 @@ if (!function_exists('public_path')) {
     }
 }
 
+if (!function_exists('save_data_enabled')) {
+    function save_data_enabled(): bool
+    {
+        return strtolower(trim((string) ($_SERVER['HTTP_SAVE_DATA'] ?? ''))) === 'on';
+    }
+}
+
+if (!function_exists('normalize_host_name')) {
+    function normalize_host_name(?string $host): string
+    {
+        $host = strtolower(trim((string) $host));
+        if ($host === '') {
+            return '';
+        }
+
+        if (str_starts_with($host, '[') && str_contains($host, ']')) {
+            $host = substr($host, 1, max(0, strpos($host, ']') - 1));
+        } else {
+            $host = preg_replace('/:\d+$/', '', $host) ?? $host;
+        }
+
+        return preg_replace('/^www\./', '', $host) ?? $host;
+    }
+}
+
+if (!function_exists('is_local_host_name')) {
+    function is_local_host_name(?string $host): bool
+    {
+        $host = normalize_host_name($host);
+        if ($host === '') {
+            return false;
+        }
+
+        if (in_array($host, ['localhost', '127.0.0.1', '::1', 'host.docker.internal'], true)) {
+            return true;
+        }
+
+        if (filter_var($host, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
+            return preg_match('/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $host) === 1;
+        }
+
+        return str_ends_with($host, '.local')
+            || str_ends_with($host, '.test')
+            || str_ends_with($host, '.localhost')
+            || str_ends_with($host, '.internal');
+    }
+}
+
+if (!function_exists('request_base_url')) {
+    function request_base_url(): ?string
+    {
+        $hostHeader = trim((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+        if ($hostHeader === '') {
+            return null;
+        }
+
+        $hostParts = array_values(array_filter(array_map('trim', explode(',', $hostHeader))));
+        $host = $hostParts[0] ?? '';
+        if ($host === '') {
+            return null;
+        }
+
+        $forwardedProto = trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? ''));
+        if ($forwardedProto !== '') {
+            $protoParts = array_values(array_filter(array_map('trim', explode(',', strtolower($forwardedProto)))));
+            $scheme = in_array(($protoParts[0] ?? ''), ['http', 'https'], true) ? $protoParts[0] : 'https';
+        } else {
+            $https = strtolower((string) ($_SERVER['HTTPS'] ?? ''));
+            $scheme = (($https !== '' && $https !== 'off') || (string) ($_SERVER['SERVER_PORT'] ?? '') === '443') ? 'https' : 'http';
+        }
+
+        $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
+        $scriptDir = rtrim($scriptDir, '/');
+        if ($scriptDir === '/public') {
+            $scriptDir = '';
+        } elseif (str_ends_with($scriptDir, '/public')) {
+            $scriptDir = substr($scriptDir, 0, -strlen('/public')) ?: '';
+        }
+        if ($scriptDir === '/' || $scriptDir === '.') {
+            $scriptDir = '';
+        }
+
+        return rtrim($scheme . '://' . $host . $scriptDir, '/');
+    }
+}
+
+if (!function_exists('public_app_url')) {
+    function public_app_url(): string
+    {
+        return app_url();
+    }
+}
+
+if (!function_exists('normalize_app_path')) {
+    function normalize_app_path(?string $path): string
+    {
+        $path = str_replace('\\', '/', trim((string) $path));
+        if ($path === '' || $path === '/') {
+            return '/';
+        }
+
+        $path = '/' . ltrim($path, '/');
+        $projectDirectory = trim(str_replace('\\', '/', basename(BASE_PATH)), '/');
+        $prefixes = [];
+
+        $runtimeBasePath = parse_url((string) request_base_url(), PHP_URL_PATH);
+        if (is_string($runtimeBasePath)) {
+            $runtimeBasePath = rtrim($runtimeBasePath, '/');
+            if ($runtimeBasePath !== '' && $runtimeBasePath !== '/') {
+                $prefixes[] = $runtimeBasePath;
+            }
+        }
+
+        if ($projectDirectory !== '') {
+            $prefixes[] = '/' . $projectDirectory;
+        }
+
+        $prefixes[] = '/public';
+
+        foreach (array_values(array_unique($prefixes)) as $prefix) {
+            if ($prefix === '' || $prefix === '/') {
+                continue;
+            }
+
+            if ($path === $prefix) {
+                $path = '/';
+                continue;
+            }
+
+            if (str_starts_with($path, $prefix . '/')) {
+                $path = substr($path, strlen($prefix)) ?: '/';
+            }
+        }
+
+        return $path === '' ? '/' : '/' . ltrim($path, '/');
+    }
+}
+
 if (!function_exists('app_url')) {
     function app_url(): string
     {
-        return rtrim((string) env('APP_URL', ''), '/');
+        $configured = rtrim((string) env('APP_URL', ''), '/');
+        $runtime = request_base_url();
+        if ($runtime === null || $runtime === '') {
+            return $configured;
+        }
+
+        if ($configured === '') {
+            return $runtime;
+        }
+
+        $configuredHost = normalize_host_name((string) parse_url($configured, PHP_URL_HOST));
+        $runtimeHost = normalize_host_name((string) parse_url($runtime, PHP_URL_HOST));
+        if ($runtimeHost !== '' && ($runtimeHost === $configuredHost || is_local_host_name($runtimeHost))) {
+            return $runtime;
+        }
+
+        return $configured;
     }
 }
 
@@ -66,10 +220,47 @@ if (!function_exists('url')) {
     }
 }
 
+if (!function_exists('should_use_minified_assets')) {
+    function should_use_minified_assets(): bool
+    {
+        $explicit = env('ASSET_MINIFY', null);
+        if ($explicit !== null) {
+            return (bool) $explicit;
+        }
+
+        return strtolower((string) env('APP_ENV', 'local')) === 'production' && !((bool) env('APP_DEBUG', false));
+    }
+}
+
+if (!function_exists('minified_asset_path')) {
+    function minified_asset_path(string $path): string
+    {
+        $path = ltrim(str_replace('\\', '/', $path), '/');
+        if ($path === '' || str_starts_with($path, 'vendor/') || preg_match('/\.min\.(?:js|css)$/i', $path) === 1) {
+            return $path;
+        }
+
+        if (!should_use_minified_assets()) {
+            return $path;
+        }
+
+        $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+        if (!in_array($extension, ['js', 'css'], true)) {
+            return $path;
+        }
+
+        $dirname = (string) pathinfo($path, PATHINFO_DIRNAME);
+        $filename = (string) pathinfo($path, PATHINFO_FILENAME);
+        $minified = ($dirname !== '' && $dirname !== '.' ? $dirname . '/' : '') . $filename . '.min.' . $extension;
+
+        return is_file(public_path('assets/' . $minified)) ? $minified : $path;
+    }
+}
+
 if (!function_exists('asset')) {
     function asset(string $path): string
     {
-        return url('assets/' . ltrim($path, '/'));
+        return url('assets/' . minified_asset_path($path));
     }
 }
 
@@ -82,10 +273,34 @@ if (!function_exists('absolute_url')) {
         }
 
         if (preg_match('/^https?:\/\//i', $path) === 1) {
-            return $path;
+            $parts = parse_url($path);
+            if ($parts === false) {
+                return $path;
+            }
+
+            $host = normalize_host_name((string) ($parts['host'] ?? ''));
+            if (!is_local_host_name($host)) {
+                return $path;
+            }
+
+            $base = public_app_url();
+            if ($base === '') {
+                return $path;
+            }
+
+            $resolvedPath = normalize_app_path((string) ($parts['path'] ?? '/'));
+            $resolved = rtrim($base, '/') . ($resolvedPath === '/' ? '' : $resolvedPath);
+            if (!empty($parts['query'])) {
+                $resolved .= '?' . $parts['query'];
+            }
+            if (!empty($parts['fragment'])) {
+                $resolved .= '#' . $parts['fragment'];
+            }
+
+            return $resolved;
         }
 
-        return url('/' . ltrim($path, '/'));
+        return url(normalize_app_path($path));
     }
 }
 
@@ -279,13 +494,14 @@ if (!function_exists('parse_named_links')) {
             }
 
             [$label, $url] = array_pad(array_map('trim', explode('|', $line, 2)), 2, '');
-            if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            $resolvedUrl = absolute_url($url);
+            if ($resolvedUrl === null || filter_var($resolvedUrl, FILTER_VALIDATE_URL) === false) {
                 continue;
             }
 
             $links[] = [
-                'label' => $label !== '' ? $label : (parse_url($url, PHP_URL_HOST) ?: $url),
-                'url' => $url,
+                'label' => $label !== '' ? $label : (parse_url($resolvedUrl, PHP_URL_HOST) ?: $resolvedUrl),
+                'url' => $resolvedUrl,
             ];
         }
 
@@ -311,14 +527,14 @@ if (!function_exists('profile_social_links')) {
 
         $links = [];
         foreach ($items as $label => $url) {
-            $url = trim((string) $url);
-            if ($url === '' || filter_var($url, FILTER_VALIDATE_URL) === false) {
+            $resolvedUrl = absolute_url($url);
+            if ($resolvedUrl === null || filter_var($resolvedUrl, FILTER_VALIDATE_URL) === false) {
                 continue;
             }
 
             $links[] = [
                 'label' => $label,
-                'url' => $url,
+                'url' => $resolvedUrl,
             ];
         }
 
@@ -500,3 +716,4 @@ if (!function_exists('is_direct_video_url')) {
         return in_array(pathinfo($path, PATHINFO_EXTENSION), ['mp4', 'webm', 'ogg'], true);
     }
 }
+

@@ -25,7 +25,7 @@
                 <label><span class='label'>Avatar fichier</span><input class='input' type='file' name='avatar' accept='.jpg,.jpeg,.png,.webp' data-preview-target='profile-avatar-preview'></label>
                 <label><span class='label'>CV fichier</span><input class='input' type='file' name='cv' accept='.pdf,application/pdf'></label>
             </div>
-            <?php if (!empty($profile['avatar_url'])): ?><img id='profile-avatar-preview' src='<?= e(url('/' . ltrim((string) $profile['avatar_url'], '/'))) ?>' alt='Avatar actuel' style='max-width:180px;border-radius:20px;object-fit:cover;'><?php else: ?><img id='profile-avatar-preview' alt='Apercu avatar' style='display:none;max-width:180px;border-radius:20px;object-fit:cover;'><?php endif; ?>
+            <?php if (!empty($profile['avatar_url'])): ?><img id='profile-avatar-preview' src='<?= e(absolute_url($profile['avatar_url'] ?? null) ?? '') ?>' alt='Avatar actuel' style='max-width:180px;border-radius:20px;object-fit:cover;'><?php else: ?><img id='profile-avatar-preview' alt='Apercu avatar' style='display:none;max-width:180px;border-radius:20px;object-fit:cover;'><?php endif; ?>
             <div class='form-row'>
                 <label><span class='label'>GitHub URL</span><input class='input' type='text' name='github_url' value='<?= e($profile['github_url'] ?? '') ?>'></label>
                 <label><span class='label'>LinkedIn URL</span><input class='input' type='text' name='linkedin_url' value='<?= e($profile['linkedin_url'] ?? '') ?>'></label>

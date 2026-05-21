@@ -41,6 +41,32 @@ class AuthService
         self::destroySession();
     }
 
+    public static function loginWithFirebaseIdToken(string $idToken, bool $remember = false): bool
+    {
+        try {
+            $claims = FirebaseService::verifyIdToken($idToken);
+            $user = self::resolveFirebaseUser($claims);
+        } catch (Throwable) {
+            return false;
+        }
+
+        if (!$user || !(int) ($user['is_active'] ?? 0)) {
+            return false;
+        }
+
+        self::storeSession($user);
+        (new User())->updateLastLogin((int) $user['id']);
+
+        if ($remember) {
+            self::issueRememberToken((int) $user['id']);
+        } else {
+            self::forgetRememberedUser((int) $user['id']);
+        }
+
+        ActivityService::log('login_firebase', 'Connexion administrateur via Firebase');
+        return true;
+    }
+
     public static function restoreRememberedUser(): void
     {
         if (auth_check()) {
@@ -86,23 +112,7 @@ class AuthService
         if ($count > 0) {
             $firstUser = Database::query('SELECT id, name, email FROM users ORDER BY id ASC LIMIT 1')->fetch();
             if ($firstUser) {
-                $profileCount = (int) Database::query('SELECT COUNT(*) total FROM profiles WHERE user_id = ?', [$firstUser['id']])->fetch()['total'];
-                if ($profileCount === 0) {
-                    Database::query(
-                        'INSERT INTO profiles (user_id, full_name, title, bio, email, location, github_url, linkedin_url, website_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-                        [
-                            $firstUser['id'],
-                            $firstUser['name'],
-                            'Fullstack Developer',
-                            'Profil administrateur initial.',
-                            $firstUser['email'],
-                            'Africa/Porto-Novo',
-                            '',
-                            '',
-                            '',
-                        ]
-                    );
-                }
+                self::ensureProfileExists((int) $firstUser['id'], (string) $firstUser['name'], (string) $firstUser['email']);
             }
             return;
         }
@@ -120,9 +130,70 @@ class AuthService
         ]);
 
         $userId = (int) Database::lastInsertId();
+        self::ensureProfileExists($userId, $bootstrapAdmin['name'], $bootstrapAdmin['email']);
+    }
+
+    private static function resolveFirebaseUser(array $claims): ?array
+    {
+        $email = strtolower(trim((string) ($claims['email'] ?? '')));
+        if (!is_valid_email($email)) {
+            return null;
+        }
+
+        $requiresVerifiedEmail = (bool) env('FIREBASE_REQUIRE_VERIFIED_EMAIL', true);
+        if ($requiresVerifiedEmail && !self::firebaseEmailVerified($claims['email_verified'] ?? false)) {
+            return null;
+        }
+
+        $userModel = new User();
+        $user = $userModel->findByEmail($email);
+        if ($user) {
+            self::ensureProfileExists((int) $user['id'], (string) ($user['name'] ?? 'Admin'), $email);
+            return $user;
+        }
+
+        if (!(bool) env('FIREBASE_AUTO_PROVISION', false)) {
+            return null;
+        }
+
+        $name = trim((string) ($claims['name'] ?? ''));
+        if ($name === '') {
+            $name = ucfirst((string) strtok($email, '@'));
+        }
+
+        $role = trim((string) env('FIREBASE_AUTO_PROVISION_ROLE', 'super_admin'));
+        if ($role === '') {
+            $role = 'super_admin';
+        }
+
+        Database::query('INSERT INTO users (name, email, password, role, is_active) VALUES (?, ?, ?, ?, 1)', [
+            $name,
+            $email,
+            password_hash(bin2hex(random_bytes(24)), PASSWORD_DEFAULT),
+            $role,
+        ]);
+
+        $userId = (int) Database::lastInsertId();
+        self::ensureProfileExists($userId, $name, $email);
+
+        return $userModel->find($userId);
+    }
+
+    private static function firebaseEmailVerified(mixed $value): bool
+    {
+        return in_array($value, [true, 1, '1', 'true', 'yes', 'on'], true);
+    }
+
+    private static function ensureProfileExists(int $userId, string $name, string $email): void
+    {
+        $profileCount = (int) Database::query('SELECT COUNT(*) total FROM profiles WHERE user_id = ?', [$userId])->fetch()['total'];
+        if ($profileCount > 0) {
+            return;
+        }
+
         Database::query(
             'INSERT INTO profiles (user_id, full_name, title, bio, email, location, github_url, linkedin_url, website_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
-            [$userId, $bootstrapAdmin['name'], 'Fullstack Developer', 'Profil administrateur initial.', $bootstrapAdmin['email'], 'Africa/Porto-Novo', '', '', '']
+            [$userId, $name, 'Fullstack Developer', 'Profil administrateur initial.', $email, 'Africa/Porto-Novo', '', '', '']
         );
     }
 

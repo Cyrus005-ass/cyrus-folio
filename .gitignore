@@ -1,0 +1,12 @@
+.env
+.env.local
+node_modules/
+vendor/
+storage/
+test-results/
+playwright-report/
+.DS_Store
+Thumbs.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

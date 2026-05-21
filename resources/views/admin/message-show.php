@@ -1,10 +1,19 @@
 <?php $pageTitle = 'Message'; ?>
+<?php
+$messageSource = strtolower(trim((string) ($message['source'] ?? 'mysql')));
+$messageSourceLabel = match ($messageSource) {
+    'merged' => 'Archive + Live',
+    'firestore', 'firebase' => 'Live Firestore',
+    default => 'Archive MySQL',
+};
+?>
 <div class='panel detail-shell'>
     <div class='split-line'>
         <div>
             <div class='kicker'>Message de contact</div>
             <h2><?= e($message['sujet'] ?? 'Message') ?></h2>
             <p class='meta'>Recu le <?= e($message['created_at'] ?? '') ?></p>
+            <p class='meta'>Flux <?= e($messageSourceLabel) ?></p>
         </div>
         <?php if (($message['statut'] ?? 'nouveau') === 'lu'): ?><span class='badge green'>Lu</span><?php else: ?><span class='badge red'>Non lu</span><?php endif; ?>
     </div>

@@ -11,7 +11,7 @@
         </div>
 
         <article class='card detail-shell'>
-            <?php if (!empty($post['image_url'])): ?><img src='<?= e(url('/' . ltrim((string) $post['image_url'], '/'))) ?>' alt='<?= e($post['titre'] ?? 'Article') ?>' style='max-height:360px;width:100%;object-fit:cover;border-radius:20px;'><?php endif; ?>
+            <?php if (!empty($post['image_url'])): ?><img src='<?= e(absolute_url($post['image_url'] ?? null) ?? '') ?>' alt='<?= e($post['titre'] ?? 'Article') ?>' loading='eager' decoding='async' fetchpriority='high' style='max-height:360px;width:100%;object-fit:cover;border-radius:20px;'><?php endif; ?>
             <?php if (!empty($post['tags'])): ?>
                 <div class='tags'>
                     <?php foreach (array_filter(array_map('trim', explode(',', (string) $post['tags']))) as $tag): ?>
@@ -19,7 +19,7 @@
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
-            <div class='rich-content'><?= $post['contenu'] ?? '' ?></div>
+            <div class='rich-content'><?= sanitize_rich_text($post['contenu'] ?? '') ?? '' ?></div>
             <div class='button-row'>
                 <a class='btn ghost' href='<?= url('/blog') ?>'>Retour au blog</a>
             </div>

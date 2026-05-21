@@ -33,7 +33,7 @@ $projectCollaborations = $projectCollaborations ?? [];
                 <?php if (!empty($project['image_url'])): ?>
                     <div class='mini-card'>
                         <strong>Couverture actuelle</strong>
-                        <img src='<?= e(url('/' . ltrim((string) $project['image_url'], '/'))) ?>' alt='Couverture du projet' style='margin-top:10px;max-height:180px;object-fit:cover;border-radius:16px;'>
+                        <img src='<?= e(absolute_url($project['image_url'] ?? null) ?? '') ?>' alt='Couverture du projet' style='margin-top:10px;max-height:180px;object-fit:cover;border-radius:16px;'>
                     </div>
                 <?php endif; ?>
                 <?php if (!empty($galleryImages)): ?>
@@ -42,7 +42,7 @@ $projectCollaborations = $projectCollaborations ?? [];
                         <div class='grid grid-3' style='margin-top:12px;'>
                             <?php foreach ($galleryImages as $image): ?>
                                 <label class='card' style='padding:12px;'>
-                                    <img src='<?= e(url('/' . ltrim($image, '/'))) ?>' alt='Image du projet' style='height:120px;width:100%;object-fit:cover;border-radius:12px;margin-bottom:10px;'>
+                                    <img src='<?= e(absolute_url($image) ?? '') ?>' alt='Image du projet' style='height:120px;width:100%;object-fit:cover;border-radius:12px;margin-bottom:10px;'>
                                     <span class='meta'><input type='checkbox' name='remove_gallery_images[]' value='<?= e($image) ?>'> Retirer</span>
                                 </label>
                             <?php endforeach; ?>

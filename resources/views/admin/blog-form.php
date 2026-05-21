@@ -28,7 +28,7 @@
             <label><span class='label'>Image couverture fichier</span><input class='input' type='file' name='image' accept='.jpg,.jpeg,.png,.webp,.gif'></label>
         </div>
         <?php if (!empty($post['image_url'])): ?>
-            <img src='<?= e(url('/' . ltrim((string) $post['image_url'], '/'))) ?>' alt='Couverture article' style='max-height:220px;object-fit:cover;border-radius:18px;'>
+            <img src='<?= e(absolute_url($post['image_url'] ?? null) ?? '') ?>' alt='Couverture article' style='max-height:220px;object-fit:cover;border-radius:18px;'>
         <?php endif; ?>
         <div class='form-row'>
             <label><span class='label'>Statut</span><select class='select' name='statut'><option value='brouillon' <?= (($post['statut'] ?? '') === 'brouillon') ? 'selected' : '' ?>>Brouillon</option><option value='publie' <?= (($post['statut'] ?? '') === 'publie') ? 'selected' : '' ?>>Publie</option></select></label>

@@ -16,8 +16,8 @@
                             <p class='meta'>Obtenue le <?= e($certification['date_obtention'] ?? '') ?></p>
                             <?php if (!empty($certification['badge_url']) || !empty($certification['lien_verification'])): ?>
                                 <div class='button-row'>
-                                    <?php if (!empty($certification['badge_url'])): ?><a class='btn ghost' href='<?= e($certification['badge_url']) ?>' target='_blank' rel='noreferrer'>Voir le badge</a><?php endif; ?>
-                                    <?php if (!empty($certification['lien_verification'])): ?><a class='btn ghost' href='<?= e($certification['lien_verification']) ?>' target='_blank' rel='noreferrer'>Verifier la certification</a><?php endif; ?>
+                                    <?php if (!empty($certification['badge_url'])): ?><a class='btn ghost' href='<?= e(absolute_url($certification['badge_url'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Voir le badge</a><?php endif; ?>
+                                    <?php if (!empty($certification['lien_verification'])): ?><a class='btn ghost' href='<?= e(absolute_url($certification['lien_verification'] ?? null) ?? '') ?>' target='_blank' rel='noreferrer'>Verifier la certification</a><?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         </div>

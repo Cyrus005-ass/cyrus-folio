@@ -1,10 +1,10 @@
-Options -Indexes
 RewriteEngine On
 
 # Bloque les dotfiles et les dossiers applicatifs hors public.
 RewriteRule (^|/)\. - [F,L]
-RewriteRule ^(?:app|config|database|resources|storage|vendor)/ - [F,L]
+RewriteRule ^(app|config|database|resources|storage|vendor)/ - [F,L]
 
-# Route toutes les requetes applicatives vers public/ quand le projet est servi depuis sa racine.
-RewriteCond %{REQUEST_URI} !/public/
+# Compatibilite hebergements partages: on sert tout depuis public/ sans regles avancees.
+RewriteCond %{REQUEST_URI} !^/public/
 RewriteRule ^(.*)$ public/$1 [L]
+

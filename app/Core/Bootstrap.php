@@ -5,7 +5,10 @@ use App\Services\AuthService;
 use App\Services\SchemaService;
 
 if (!headers_sent()) {
-    $secureCookie = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $forwardedProto = strtolower(trim((string) ($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '')));
+    $secureCookie = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (string) ($_SERVER['SERVER_PORT'] ?? '') === '443'
+        || $forwardedProto === 'https';
     ini_set('session.use_strict_mode', '1');
     ini_set('session.use_only_cookies', '1');
     session_set_cookie_params([
@@ -37,6 +40,10 @@ if (!headers_sent()) {
     header('X-Frame-Options: SAMEORIGIN');
     header('X-Content-Type-Options: nosniff');
     header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('X-Permitted-Cross-Domain-Policies: none');
+    header('Cross-Origin-Opener-Policy: same-origin');
+    header('Cross-Origin-Resource-Policy: same-origin');
+    header('Origin-Agent-Cluster: ?1');
 
     if ($secureCookie) {
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains');
@@ -56,6 +63,28 @@ define('STORAGE_PATH', BASE_PATH . '/storage');
 
 require_once APP_PATH . '/Core/Env.php';
 Env::load(BASE_PATH . '/.env');
+
+$runtimeHostHeader = trim((string) ($_SERVER['HTTP_X_FORWARDED_HOST'] ?? $_SERVER['HTTP_HOST'] ?? $_SERVER['SERVER_NAME'] ?? ''));
+$runtimeHost = strtolower(trim((string) explode(',', $runtimeHostHeader)[0]));
+if (str_starts_with($runtimeHost, '[') && str_contains($runtimeHost, ']')) {
+    $runtimeHost = substr($runtimeHost, 1, max(0, strpos($runtimeHost, ']') - 1));
+} else {
+    $runtimeHost = preg_replace('/:\d+$/', '', $runtimeHost) ?? $runtimeHost;
+}
+
+$isLocalRuntime = PHP_SAPI === 'cli'
+    || in_array($runtimeHost, ['localhost', '127.0.0.1', '::1', 'host.docker.internal'], true)
+    || (filter_var($runtimeHost, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false
+        && preg_match('/^(10\.|192\.168\.|172\.(1[6-9]|2[0-9]|3[0-1])\.)/', $runtimeHost) === 1)
+    || str_ends_with($runtimeHost, '.local')
+    || str_ends_with($runtimeHost, '.test')
+    || str_ends_with($runtimeHost, '.localhost')
+    || str_ends_with($runtimeHost, '.internal');
+
+if ($isLocalRuntime) {
+    // Allow local DB and URL overrides without editing the shared .env.
+    Env::load(BASE_PATH . '/.env.local');
+}
 
 $appConfigFile = CONFIG_PATH . '/app.php';
 define('APP_CONFIG', is_file($appConfigFile) ? require $appConfigFile : []);

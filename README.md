@@ -36,15 +36,17 @@ Ce README documente la structure du projet, le role des fichiers et dossiers uti
 - MySQL ou MariaDB
 - WAMP ou equivalent
 - Composer
+- Node.js optionnel pour regenerer les assets minifies
 
 ### Installation rapide
 1. Placer le projet dans `c:\wamp64\www\portfolio-os`.
 2. Importer `database/portfolio_os.sql` dans la base `portfolio_os`.
-3. Copier `.env.example` vers `.env` et adapter les valeurs.
+3. Copier `.env.example` vers `.env` pour une installation simple, ou creer un `.env.local` si ton `.env` contient deja la configuration de production.
 4. Lancer `composer install` si le dossier `vendor/` n'est pas deja present.
-5. Ouvrir `http://localhost/portfolio-os`.
-6. Ouvrir `http://localhost/portfolio-os/admin/login` pour l'administration.
-
+5. Lancer `npm install` puis `npm run build:assets` si tu veux regenerer les assets minifies.
+6. En local WAMP, ouvrir `http://localhost/portfolio-os`.
+7. En local WAMP, ouvrir `http://localhost/portfolio-os/admin/login` pour l'administration.
+8. En production, ouvrir `https://cyrus-youp.unaux.com`.
 ### Premier administrateur
 Le projet peut creer automatiquement un premier compte admin si la table `users` est vide.
 
@@ -55,12 +57,12 @@ Pour cela :
 - remettre ensuite `ADMIN_BOOTSTRAP_ENABLED=false`
 
 ## URLs utiles
-- Site public : `http://localhost/portfolio-os`
-- A propos : `http://localhost/portfolio-os/about`
-- Contact : `http://localhost/portfolio-os/contact`
-- Login admin : `http://localhost/portfolio-os/admin/login`
-- Dashboard admin : `http://localhost/portfolio-os/admin`
-- API chatbot : `http://localhost/portfolio-os/api/v1/chatbot/message`
+- Site public : `https://cyrus-youp.unaux.com`
+- A propos : `https://cyrus-youp.unaux.com/about`
+- Contact : `https://cyrus-youp.unaux.com/contact`
+- Login admin : `https://cyrus-youp.unaux.com/admin/login`
+- Dashboard admin : `https://cyrus-youp.unaux.com/admin`
+- API chatbot : `https://cyrus-youp.unaux.com/api/v1/chatbot/message`
 
 ## Variables d'environnement importantes
 ### Application
@@ -68,10 +70,24 @@ Pour cela :
 - `APP_URL` : URL de base du projet. Tres important pour les liens et assets.
 - `APP_ENV` : `local` ou `production`.
 - `APP_DEBUG` : active l'affichage des erreurs PHP en local.
+- `ASSET_MINIFY` : charge les fichiers `.min.css` et `.min.js` quand ils existent.
+- `.env.local` : surcharge optionnelle chargee uniquement en runtime local/CLI pour garder un `.env` de prod intact.
 - `APP_AUTHOR`, `APP_DESCRIPTION`, `APP_KEYWORDS`, `APP_ROBOTS`, `APP_OG_IMAGE`, `APP_TWITTER_HANDLE`, `APP_THEME_COLOR` : meta SEO et partage.
-
 ### Base de donnees
 - `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD` : connexion MySQL.
+
+### Firebase
+- `FIREBASE_ENABLED` : active l'integration Firebase cote backend.
+- `FIREBASE_PROJECT_ID` : identifiant du projet Firebase.
+- `FIREBASE_CREDENTIALS` : chemin du fichier JSON de compte de service, recommande dans `storage/secure/firebase-service-account.json`.
+- `GOOGLE_APPLICATION_CREDENTIALS` et `GOOGLE_CLOUD_PROJECT` sont aussi acceptes pour coller a la configuration officielle Google/Firebase.
+- `FIREBASE_STORAGE_BUCKET` : bucket Firebase Storage si tu utilises le stockage.
+- `FIREBASE_REQUIRE_VERIFIED_EMAIL` : refuse les connexions Firebase avec email non verifie.
+- `FIREBASE_AUTO_PROVISION` : cree automatiquement un utilisateur local si l'email Firebase n'existe pas encore.
+- `FIREBASE_AUTO_PROVISION_ROLE` : role local a attribuer lors de l'auto-provisioning.
+- `FIREBASE_TIMEOUT`, `FIREBASE_CA_BUNDLE` : options reseau/SSL utiles surtout sous Windows.
+- `FIREBASE_MESSAGES_SYNC` : active la synchro du module messages/contact vers Firestore.
+- `FIREBASE_MESSAGES_COLLECTION` : nom de la collection Firestore pour les messages live.
 
 ### Bootstrap admin
 - `ADMIN_BOOTSTRAP_ENABLED` : creation automatique du premier admin.
@@ -87,13 +103,12 @@ Pour cela :
 - `DASHBOARD_UNREAD_ALERT_DAYS` : seuil pour signaler les messages non lus anciens.
 - `POST_VIEW_NOTIFICATION_THRESHOLDS` : paliers de vues du blog pour creer des notifications.
 
-### xAI / chatbot
-- `XAI_API_URL` : endpoint xAI.
-- `XAI_MODEL` : modele xAI.
-- `XAI_TIMEOUT` : timeout HTTP.
-- `XAI_API_KEY` : cle API xAI.
-- `XAI_CA_BUNDLE` : chemin optionnel vers un bundle CA si besoin SSL sur Windows.
-
+### Groq / chatbot
+- `GROQ_API_URL` : endpoint Groq compatible OpenAI.
+- `GROQ_MODEL` : modele utilise pour le chatbot.
+- `GROQ_TIMEOUT` : timeout HTTP.
+- `GROQ_API_KEY` : cle API Groq.
+- `GROQ_CA_BUNDLE` : chemin optionnel vers un bundle CA si besoin SSL sur Windows.
 ## Comment l'application fonctionne
 ### Flux principal d'une requete web
 1. `index.php` a la racine redirige vers `public/index.php`.
@@ -102,6 +117,7 @@ Pour cela :
 4. `Bootstrap.php` :
    - demarre la session
    - charge `.env`
+   - charge `.env.local` si l'execution se fait en local ou en CLI
    - charge Composer si present
    - enregistre l'autoload `App\`
    - charge tous les helpers
@@ -113,6 +129,18 @@ Pour cela :
 7. Le controleur appelle models, services et helpers.
 8. La vue est rendue via `view()` puis encapsulee dans un layout.
 9. Le layout charge le CSS, le JS, le theme actif et les composants communs.
+
+## Firebase
+- Le backend inclut maintenant `app/services/FirebaseService.php` pour verifier un `idToken` Firebase, obtenir un token Google OAuth de service account et preparer les appels Firestore/Storage en REST.
+- Le login API `POST /api/v1/auth/login` accepte maintenant `firebase_id_token`, `firebaseIdToken`, `idToken` ou un header `Authorization: Bearer <idToken>` quand Firebase est active.
+- Le backend ne stocke pas la cle JSON dans le repo : place le fichier du compte de service dans `storage/secure/firebase-service-account.json` puis renseigne `FIREBASE_CREDENTIALS`.
+- Le mapping d'authentification reste volontairement prudent : par defaut, un utilisateur Firebase doit correspondre a un utilisateur local via son email.
+- Si tu actives `FIREBASE_AUTO_PROVISION=true`, le backend peut creer le compte local a la premiere connexion Firebase.
+- `app/services/MessageService.php` synchronise maintenant les messages du formulaire de contact vers Firestore quand `FIREBASE_MESSAGES_SYNC=true`.
+- `POST /api/v1/messages` archive en MySQL puis pousse le message vers Firestore si Firebase est active.
+- `GET /api/v1/messages` et `GET /api/v1/messages/{id}` renvoient maintenant un flux fusionne archive MySQL + live Firestore pour les admins connectes.
+- Les endpoints admin `GET /api/v1/messages*`, `PUT /api/v1/messages/{id}/read` et `DELETE /api/v1/messages/{id}` acceptent aussi un header `Authorization: Bearer <Firebase idToken>`.
+- La page admin `/admin/messages` se resynchronise maintenant automatiquement via polling AJAX sur ce flux fusionne.
 
 ### Exemple : connexion admin
 - `GET /admin/login` -> `AuthController::loginForm()` -> `resources/views/auth/login.php` avec `resources/layouts/auth.php`.
@@ -136,8 +164,8 @@ Pour cela :
 - `resources/components/chatbot-widget.php` affiche le widget.
 - `public/assets/js/chatbot.js` capture le message et appelle `/api/v1/chatbot/message`.
 - `ChatbotController::message()` delegue a `ChatbotService`.
-- `ChatbotService` tente xAI si une cle existe.
-- Si xAI echoue, un fallback local repond a partir du profil, des projets, des competences, des certifications et de la base de connaissance.
+- `ChatbotService` tente Groq si une cle existe.
+- Si Groq echoue, un fallback local repond a partir du profil, des projets, des competences, des certifications et de la base de connaissance.
 - Les echecs distants sont traces dans `storage/logs/chatbot.log`.
 
 ## Structure du projet
@@ -146,22 +174,23 @@ Note : la section suivante decrit tous les fichiers custom importants du projet.
 ### Racine
 - `index.php` : point d'entree racine, relaie vers `public/index.php`.
 - `.htaccess` : redirige les requetes vers `public/`.
-- `.env` : configuration locale privee.
-- `.env.example` : modele de configuration.
+- `.env` : configuration principale privee.
+- `.env.local` : surcharge locale optionnelle pour WAMP/XAMPP et les tests CLI.
+- `.env.example` : modele de configuration de depart.
 - `composer.json` : dependances Composer. Ici PHPMailer.
 - `composer.lock` : version verrouillee des dependances.
 - `README.md` : documentation du projet.
 
 ### `config/`
-- `config/app.php` : expose les valeurs applicatives lues depuis `.env`.
-- `config/database.php` : stocke la config DB lue depuis `.env`.
+- `config/app.php` : expose les valeurs applicatives lues depuis `.env` puis `.env.local` si present.
+- `config/database.php` : stocke la config DB lue depuis `.env` puis `.env.local` si present.
 - `config/routes.php` : declare toutes les routes publiques, admin et API.
 
 ### `database/`
 - `database/portfolio_os.sql` : schema principal complet de la base de donnees.
 
 ### `storage/`
-- `storage/logs/chatbot.log` : journal des erreurs ou refus cote xAI.
+- `storage/logs/chatbot.log` : journal des erreurs ou refus cote Groq.
 
 ### `vendor/`
 - `vendor/autoload.php` : autoload Composer.
@@ -172,7 +201,7 @@ Note : la section suivante decrit tous les fichiers custom importants du projet.
 - `app/Core/Bootstrap.php` : bootstrap global de l'application.
 - `app/Core/Controller.php` : classe mere des controleurs, avec `view()`, `json()`, `requireAdmin()`, `validateCsrf()`.
 - `app/Core/Database.php` : connexion PDO et execution SQL.
-- `app/Core/Env.php` : chargeur `.env`.
+- `app/Core/Env.php` : chargeur `.env` et `.env.local`.
 - `app/Core/Model.php` : mini ORM simple pour CRUD generique.
 - `app/Core/Router.php` : routeur maison avec params dynamiques du type `{id}` ou `{slug}`.
 
@@ -217,7 +246,7 @@ Note : la section suivante decrit tous les fichiers custom importants du projet.
 - `NotificationService.php` : creation de notifications internes et alertes certifications.
 - `AnalyticsService.php` : tracking serveur des visites publiques.
 - `ActivityService.php` : journalisation des actions sans bloquer l'application.
-- `ChatbotService.php` : cerveau du chatbot, xAI + fallback local + logs.
+- `ChatbotService.php` : cerveau du chatbot, Groq + fallback local + logs.
 
 ### `app/helpers/`
 - `helpers.php` : helpers globaux (`url`, `asset`, `absolute_url`, `view`, `flash`, `excerpt`, `theme_defaults`, `profile_social_links`, `social_platform_icon`, `presentation_video_data`, etc.).
@@ -457,27 +486,27 @@ La video est rendue dans `resources/views/public/about.php` et pas sur l'accueil
 
 ### Comment il repond
 1. Le widget envoie le message et un petit historique a `/api/v1/chatbot/message`.
-2. `ChatbotService` tente d'abord xAI si `XAI_API_KEY` existe.
-3. Si xAI repond correctement, la reponse distante est utilisee.
+2. `ChatbotService` tente d'abord Groq si `GROQ_API_KEY` existe.
+3. Si Groq repond correctement, la reponse distante est utilisee.
 4. Sinon, le service bascule sur une reponse locale basee sur :
    - le profil
    - les projets publics
    - les competences
    - les certifications
    - la base `chatbot_knowledge`
-5. Le service renvoie aussi la source (`xai` ou `local`) dans la zone admin de test.
+5. Le service renvoie aussi la source (`groq` ou `local`) dans la zone admin de test.
 
 ### Etat actuel a connaitre
-Le code de connexion xAI a ete fiabilise, notamment pour la gestion SSL/CA sous Windows. En revanche, la cle xAI actuellement testee retourne un `403` lie a l'absence de credits/licence sur le compte equipe xAI. Cela veut dire :
+Le code de connexion Groq a ete fiabilise, notamment pour la gestion SSL/CA sous Windows. En revanche, la cle Groq actuellement testee retourne un `403` lie a l'absence de credits/licence sur le compte equipe Groq. Cela veut dire :
 - le chatbot n'est pas casse en code
 - le fallback local fonctionne
-- pour activer la vraie reponse distante, il faut une cle xAI rattachee a un compte approvisionne et autorise
+- pour activer la vraie reponse distante, il faut une cle Groq valide et active
 
 ### Comment le rendre plus intelligent
 - remplir correctement le profil admin
 - publier de vrais projets et competences
 - ajouter des connaissances dans `/admin/chatbot`
-- fournir une cle xAI valide avec credits
+- fournir une cle Groq valide avec credits
 - surveiller `storage/logs/chatbot.log` si la partie distante ne repond pas
 
 ## Systeme analytics
@@ -512,7 +541,7 @@ Cette liste resume les fichiers les plus importants modifies/adaptes pour l'etat
 - `app/controllers/ProfileController.php` : sauvegarde profil et validation reseaux/media
 - `app/helpers/validation.php` : validation des URLs et assets publics
 - `app/helpers/helpers.php` : helpers sociaux, video, theme par defaut
-- `app/services/ChatbotService.php` : logique chatbot, xAI, fallback, logs
+- `app/services/ChatbotService.php` : logique chatbot, Groq, fallback, logs
 - `app/controllers/ChatbotController.php` : endpoint et diagnostics admin
 - `public/assets/js/chatbot.js` : experience front du chatbot
 - `public/assets/js/main.js` : menu mobile, animation de texte, reveals
@@ -534,7 +563,7 @@ Cette liste resume les fichiers les plus importants modifies/adaptes pour l'etat
 - Le projet n'utilise pas un framework complet type Laravel : tout est maison, donc il faut garder une discipline de structure.
 - `SchemaService` joue le role de mini migration additive, mais ce n'est pas un vrai systeme de migrations versionnees.
 - Le tracking analytics est basique et serveur-side.
-- Le chatbot distant depend vraiment du compte xAI et de ses credits/licences.
+- Le chatbot distant depend vraiment du compte Groq et de ses credits/licences.
 - Les layouts lisent les variables de theme a chaque rendu, ce qui est pratique mais centralise beaucoup de responsabilites dans `ThemeService`.
 - Les middlewares existent mais ne sont pas encore branches comme dans un framework full-stack ; les controleurs gerent eux-memes une bonne partie des gardes.
 

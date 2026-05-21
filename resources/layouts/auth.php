@@ -14,9 +14,11 @@ $themeColor = trim((string) ($activeTheme['primary_color'] ?? '#ff4d4f'));
     <meta name='robots' content='noindex,nofollow'>
     <meta name='referrer' content='strict-origin-when-cross-origin'>
     <meta name='theme-color' content='<?= e($themeColor) ?>'>
+    <?php if ($fontStylesheetUrl = ThemeService::fontStylesheetUrl($activeTheme)): ?>
     <link rel='preconnect' href='https://fonts.googleapis.com'>
     <link rel='preconnect' href='https://fonts.gstatic.com' crossorigin>
-    <link href='https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700;800&family=Raleway:wght@500;600;700;800;900&family=Roboto:wght@400;500;700&display=swap' rel='stylesheet'>
+    <link href='<?= e($fontStylesheetUrl) ?>' rel='stylesheet'>
+    <?php endif; ?>
     <link rel='stylesheet' href='<?= asset('vendor/bootstrap-icons/bootstrap-icons.css') ?>'>
     <style><?= ThemeService::cssVariables() ?></style>
     <link rel='stylesheet' href='<?= asset('css/main.css') ?>'>
